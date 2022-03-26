@@ -2,28 +2,46 @@ import '@fontsource/roboto/300.css';
 import '@fontsource/roboto/400.css';
 import '@fontsource/roboto/500.css';
 import '@fontsource/roboto/700.css';
-import React from 'react';
-import ReactDOM from 'react-dom';
+import { LinearProgress } from '@mui/material';
+import { lazy, StrictMode, Suspense } from 'react';
+import { render } from 'react-dom';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import Base from './Base';
-import Books from './Books';
-import Borrow from './Borrow';
-import Home from './Home';
 import reportWebVitals from './reportWebVitals';
-import Signin from './Signin';
-ReactDOM.render(
-  <React.StrictMode>
+const Signin = lazy(() => import('./Signin'));
+const Home = lazy(() => import('./Home'));
+const Books = lazy(() => import('./Books'));
+const Borrow = lazy(() => import('./Borrow'));
+render(
+  <StrictMode>
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<Base />}>
-          <Route index element={<Home />} />
-          <Route path="borrow" element={<Borrow />} />
-          <Route path="books" element={<Books />} />
+          <Route index element={
+            <Suspense fallback={<LinearProgress sx={{ mt: 10 }} />}>
+              <Home />
+            </Suspense>
+          } />
+          <Route path="borrow" element={
+            <Suspense fallback={<LinearProgress sx={{ mt: 10 }} />}>
+              <Borrow />
+            </Suspense>
+          } />
+          <Route path="books" element={
+            <Suspense fallback={<LinearProgress sx={{ mt: 10 }} />}>
+              <Books />
+            </Suspense>
+          } />
         </Route>
-        <Route path="/signin" element={<Signin />} />
+        <Route path="/signin" element={
+          <Suspense fallback={<LinearProgress />}>
+            <Signin />
+          </Suspense>
+        } />
+        <Route path="/*" element={<p style={{ textAlign: "center", fontSize: 70 }}>PAGE NOT FOUND</p>} />
       </Routes>
     </BrowserRouter>
-  </React.StrictMode>,
+  </StrictMode>,
   document.getElementById('root')
 );
 

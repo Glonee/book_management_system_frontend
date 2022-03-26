@@ -11,21 +11,21 @@ function Base() {
                     <Button
                         color="inherit"
                         size="large"
-                        onClick={() => navigate("/")}
+                        onClick={() => navigate("/", { replace: true })}
                     >
                         Home
                     </Button>
                     <Button
                         color="inherit"
                         size="large"
-                        onClick={() => navigate("books")}
+                        onClick={() => navigate("books", { replace: true })}
                     >
                         Books
                     </Button>
                     <Button
                         color="inherit"
                         size="large"
-                        onClick={() => navigate("borrow")}
+                        onClick={() => navigate("borrow", { replace: true })}
                     >
                         Borrow/Renew/Return
                     </Button>

@@ -8,6 +8,7 @@ import { render } from 'react-dom';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import Base from './Base';
 import reportWebVitals from './reportWebVitals';
+import ErrorBoundary from './ErrorBoundary';
 const Signin = lazy(() => import('./Signin'));
 const Home = lazy(() => import('./Home'));
 const Books = lazy(() => import('./Books'));
@@ -15,31 +16,33 @@ const Borrow = lazy(() => import('./Borrow'));
 render(
   <StrictMode>
     <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<Base />}>
-          <Route index element={
-            <Suspense fallback={<LinearProgress sx={{ mt: 10 }} />}>
-              <Home />
+      <ErrorBoundary>
+        <Routes>
+          <Route path="/" element={<Base />}>
+            <Route index element={
+              <Suspense fallback={<LinearProgress sx={{ mt: 10 }} />}>
+                <Home />
+              </Suspense>
+            } />
+            <Route path="borrow" element={
+              <Suspense fallback={<LinearProgress sx={{ mt: 10 }} />}>
+                <Borrow />
+              </Suspense>
+            } />
+            <Route path="books" element={
+              <Suspense fallback={<LinearProgress sx={{ mt: 10 }} />}>
+                <Books />
+              </Suspense>
+            } />
+          </Route>
+          <Route path="/signin" element={
+            <Suspense fallback={<LinearProgress />}>
+              <Signin />
             </Suspense>
           } />
-          <Route path="borrow" element={
-            <Suspense fallback={<LinearProgress sx={{ mt: 10 }} />}>
-              <Borrow />
-            </Suspense>
-          } />
-          <Route path="books" element={
-            <Suspense fallback={<LinearProgress sx={{ mt: 10 }} />}>
-              <Books />
-            </Suspense>
-          } />
-        </Route>
-        <Route path="/signin" element={
-          <Suspense fallback={<LinearProgress />}>
-            <Signin />
-          </Suspense>
-        } />
-        <Route path="/*" element={<p style={{ textAlign: "center", fontSize: 70 }}>PAGE NOT FOUND</p>} />
-      </Routes>
+          <Route path="/*" element={<p style={{ textAlign: "center", fontSize: 70 }}>PAGE NOT FOUND</p>} />
+        </Routes>
+      </ErrorBoundary>
     </BrowserRouter>
   </StrictMode>,
   document.getElementById('root')

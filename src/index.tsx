@@ -1,12 +1,28 @@
+import '@fontsource/roboto/300.css';
+import '@fontsource/roboto/400.css';
+import '@fontsource/roboto/500.css';
+import '@fontsource/roboto/700.css';
 import React from 'react';
 import ReactDOM from 'react-dom';
-import './index.css';
-import App from './App';
+import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import Base from './Base';
+import Books from './Books';
+import Borrow from './Borrow';
+import Home from './Home';
 import reportWebVitals from './reportWebVitals';
-
+import Signin from './Signin';
 ReactDOM.render(
   <React.StrictMode>
-    <App />
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<Base />}>
+          <Route index element={<Home />} />
+          <Route path="borrow" element={<Borrow />} />
+          <Route path="books" element={<Books />} />
+        </Route>
+        <Route path="/signin" element={<Signin />} />
+      </Routes>
+    </BrowserRouter>
   </React.StrictMode>,
   document.getElementById('root')
 );

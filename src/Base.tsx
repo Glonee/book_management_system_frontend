@@ -1,9 +1,16 @@
 import {
     AppBar, Button, Toolbar
 } from "@mui/material";
+import { useEffect } from "react";
 import { Outlet, useNavigate } from "react-router-dom";
 function Base() {
     const navigate = useNavigate();
+    useEffect(() => {
+        if (localStorage.getItem("token") === null) {
+            //navigate("/signin", { replace: true });
+            console.log("haha");
+        }
+    });
     return (
         <>
             <AppBar>
@@ -31,7 +38,9 @@ function Base() {
                     </Button>
                 </Toolbar>
             </AppBar>
-            <Outlet />
+            <div style={{ marginTop: 70 }}>
+                <Outlet />
+            </div>
         </>
     )
 }

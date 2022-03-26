@@ -7,12 +7,12 @@ import { lazy, StrictMode, Suspense } from 'react';
 import { render } from 'react-dom';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import Base from './Base';
-import reportWebVitals from './reportWebVitals';
 import ErrorBoundary from './ErrorBoundary';
+import reportWebVitals from './reportWebVitals';
 const Signin = lazy(() => import('./Signin'));
-const Home = lazy(() => import('./Home'));
-const Books = lazy(() => import('./Books'));
-const Borrow = lazy(() => import('./Borrow'));
+const Home = lazy(() => import('./Pages/Home'));
+const Books = lazy(() => import('./Pages/Books'));
+const Borrow = lazy(() => import('./Pages/Borrow'));
 render(
   <StrictMode>
     <BrowserRouter>

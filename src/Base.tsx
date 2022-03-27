@@ -12,8 +12,7 @@ function Base() {
     });
     const pages = [
         { name: "Home", to: "/" },
-        { name: "Books", to: "books" },
-        { name: "Borrow", to: "borrow" }
+        { name: "Books", to: "books" }
     ]
     return (
         <>

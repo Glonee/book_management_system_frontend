@@ -13,7 +13,6 @@ const Signin = lazy(() => import('./Signin'));
 const Signup = lazy(() => import('./Signup'));
 const Home = lazy(() => import('./Pages/Home'));
 const Books = lazy(() => import('./Pages/Books'));
-const Borrow = lazy(() => import('./Pages/Borrow'));
 render(
   <StrictMode>
     <BrowserRouter>
@@ -23,11 +22,6 @@ render(
             <Route index element={
               <Suspense fallback={<LinearProgress />}>
                 <Home />
-              </Suspense>
-            } />
-            <Route path="borrow" element={
-              <Suspense fallback={<LinearProgress />}>
-                <Borrow />
               </Suspense>
             } />
             <Route path="books" element={

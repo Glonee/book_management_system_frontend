@@ -42,7 +42,7 @@ function Signup() {
                     type="password"
                     value={pwd}
                     onChange={e => setPwd(e.target.value)}
-                    helperText={pwd !== "" && pwd.length < 8 ? "Password too short" : ""}
+                    helperText={pwd !== "" && pwd.length < 8 ? "Too short" : ""}
                 />
                 <TextField
                     error={pwd !== repwd && repwd !== ""}

@@ -10,6 +10,7 @@ import Base from './Base';
 import ErrorBoundary from './ErrorBoundary';
 import reportWebVitals from './reportWebVitals';
 const Signin = lazy(() => import('./Signin'));
+const Signup = lazy(() => import('./Signup'));
 const Home = lazy(() => import('./Pages/Home'));
 const Books = lazy(() => import('./Pages/Books'));
 const Borrow = lazy(() => import('./Pages/Borrow'));
@@ -20,17 +21,17 @@ render(
         <Routes>
           <Route path="/" element={<Base />}>
             <Route index element={
-              <Suspense fallback={<LinearProgress sx={{ mt: 10 }} />}>
+              <Suspense fallback={<LinearProgress />}>
                 <Home />
               </Suspense>
             } />
             <Route path="borrow" element={
-              <Suspense fallback={<LinearProgress sx={{ mt: 10 }} />}>
+              <Suspense fallback={<LinearProgress />}>
                 <Borrow />
               </Suspense>
             } />
             <Route path="books" element={
-              <Suspense fallback={<LinearProgress sx={{ mt: 10 }} />}>
+              <Suspense fallback={<LinearProgress />}>
                 <Books />
               </Suspense>
             } />
@@ -38,6 +39,11 @@ render(
           <Route path="/signin" element={
             <Suspense fallback={<LinearProgress />}>
               <Signin />
+            </Suspense>
+          } />
+          <Route path="/signup" element={
+            <Suspense fallback={<LinearProgress />}>
+              <Signup />
             </Suspense>
           } />
           <Route path="/*" element={<p style={{ textAlign: "center", fontSize: 70 }}>PAGE NOT FOUND</p>} />

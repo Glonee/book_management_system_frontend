@@ -1,18 +1,17 @@
 import {
-    Avatar, Box, Button, Container, CssBaseline, Link, TextField, Typography
+    Box, Button, Container, CssBaseline, Link, TextField, Typography
 } from "@mui/material";
-import { blue } from "@mui/material/colors";
 import { useState } from "react";
 import { Link as RouterLink, useNavigate } from "react-router-dom";
-function Signin() {
+function Signup() {
     const [user, setUser] = useState("");
     const [pwd, setPwd] = useState("");
+    const [repwd, setRepwd] = useState("");
     const navigate = useNavigate();
     function handleSubbmit() {
-        if (user !== "" && pwd !== "") {
+        if (user !== "" && pwd !== "" && pwd === repwd) {
             console.log({ email: user, password: pwd });
-            localStorage.setItem("token", "123");
-            navigate("/", { replace: true });
+            navigate("/signin", { replace: true });
         }
     }
     return (
@@ -24,8 +23,7 @@ function Signin() {
                 flexDirection: "column",
                 marginTop: 10
             }}>
-                <Avatar sx={{ bgcolor: blue[500], mb: 1 }} />
-                <Typography component="h1" variant="h5">Sign in</Typography>
+                <Typography component="h1" variant="h5">Sign up</Typography>
                 <TextField
                     margin="normal"
                     fullWidth
@@ -37,31 +35,37 @@ function Signin() {
                     onChange={e => setUser(e.target.value)}
                 />
                 <TextField
+                    error={pwd !== "" && pwd.length < 8}
                     margin="normal"
                     fullWidth
                     label="Password"
-                    autoComplete="password"
                     type="password"
                     value={pwd}
                     onChange={e => setPwd(e.target.value)}
-                    onKeyDown={e => {
-                        if (e.key === "Enter") {
-                            handleSubbmit();
-                        }
-                    }}
+                    helperText={pwd !== "" && pwd.length < 8 ? "Password too short" : ""}
+                />
+                <TextField
+                    error={pwd !== repwd && repwd !== ""}
+                    margin="normal"
+                    fullWidth
+                    label="Confirm Password"
+                    type="password"
+                    value={repwd}
+                    onChange={e => setRepwd(e.target.value)}
+                    helperText={pwd !== repwd && repwd !== "" ? "Passwords does not match" : ""}
                 />
                 <Button
                     sx={{ mt: 2, mb: 3 }}
                     fullWidth
                     variant="contained"
-                    disabled={user === "" || pwd === ""}
+                    disabled={user === "" || pwd === "" || pwd !== repwd}
                     onClick={handleSubbmit}
                 >
-                    Sign In
+                    Sign Up
                 </Button>
-                <Link component={RouterLink} to="/signup">Don't have a account? Sign up</Link>
+                <Link component={RouterLink} to="/signin">Already have a account? Sign in</Link>
             </Box>
         </Container>
     );
 }
-export default Signin;
+export default Signup;

@@ -1,5 +1,5 @@
 import {
-    AppBar, Button, Toolbar
+    AppBar, Button, Toolbar, Box
 } from "@mui/material";
 import { useEffect } from "react";
 import { Outlet, useNavigate } from "react-router-dom";
@@ -7,34 +7,37 @@ function Base() {
     const navigate = useNavigate();
     useEffect(() => {
         if (localStorage.getItem("token") === null) {
-            //navigate("/signin", { replace: true });
-            console.log("haha");
+            navigate("/signin", { replace: true });
         }
     });
+    const pages = [
+        { name: "Home", to: "/" },
+        { name: "Books", to: "books" },
+        { name: "Borrow", to: "borrow" }
+    ]
     return (
         <>
             <AppBar>
                 <Toolbar>
+                    <Box sx={{ width: "100%" }}>
+                        {pages.map((page) => (
+                            <Button
+                                key={page.name}
+                                color="inherit"
+                                onClick={() => navigate(page.to, { replace: true })}
+                            >
+                                {page.name}
+                            </Button>
+                        ))}
+                    </Box>
                     <Button
                         color="inherit"
-                        size="large"
-                        onClick={() => navigate("/", { replace: true })}
+                        onClick={() => {
+                            localStorage.clear();
+                            navigate("/signin", { replace: true });
+                        }}
                     >
-                        Home
-                    </Button>
-                    <Button
-                        color="inherit"
-                        size="large"
-                        onClick={() => navigate("books", { replace: true })}
-                    >
-                        Books
-                    </Button>
-                    <Button
-                        color="inherit"
-                        size="large"
-                        onClick={() => navigate("borrow", { replace: true })}
-                    >
-                        Borrow/Renew/Return
+                        LOGOUT
                     </Button>
                 </Toolbar>
             </AppBar>

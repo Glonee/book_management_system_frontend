@@ -12,6 +12,7 @@ function Signin() {
         if (user !== "" && pwd !== "") {
             console.log({ email: user, password: pwd });
             localStorage.setItem("token", "123");
+            localStorage.setItem("username", user);
             navigate("/", { replace: true });
         }
     }

@@ -7,13 +7,13 @@ function Base() {
     const navigate = useNavigate();
     useEffect(() => {
         if (localStorage.getItem("token") === null) {
-            navigate("/signin", { replace: true });
+            navigate("/bms/signin", { replace: true });
         }
     });
     const pages = [
-        { name: "Home", to: "/" },
-        { name: "Books", to: "books" },
-        { name: "Borrow", to: "/"}
+        { name: "Home", to: "/bms" },
+        { name: "Books", to: "/bms/books" },
+        { name: "Borrow", to: "/bms"}
     ]
     return (
         <>
@@ -34,7 +34,7 @@ function Base() {
                         color="inherit"
                         onClick={() => {
                             localStorage.clear();
-                            navigate("/signin", { replace: true });
+                            navigate("/bms/signin", { replace: true });
                         }}
                     >
                         LOGOUT

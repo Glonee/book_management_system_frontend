@@ -4,38 +4,42 @@ import '@fontsource/roboto/500.css';
 import '@fontsource/roboto/700.css';
 import { LinearProgress } from '@mui/material';
 import { lazy, StrictMode, Suspense } from 'react';
-import { render } from 'react-dom';
+import { createRoot } from 'react-dom/client';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import Base from './Base';
 import ErrorBoundary from './ErrorBoundary';
+import NavigatePage from './NavigatePage';
 import reportWebVitals from './reportWebVitals';
 const Signin = lazy(() => import('./Signin'));
 const Signup = lazy(() => import('./Signup'));
 const Home = lazy(() => import('./Pages/Home'));
 const Books = lazy(() => import('./Pages/Books'));
-render(
+const container: any = document.getElementById('root');
+const root = createRoot(container);
+root.render(
   <StrictMode>
     <BrowserRouter>
       <ErrorBoundary>
         <Routes>
-          <Route path="/" element={<Base />}>
+          <Route path="/" element={<NavigatePage />} />
+          <Route path="/bms" element={<Base />}>
             <Route index element={
               <Suspense fallback={<LinearProgress />}>
                 <Home />
               </Suspense>
             } />
-            <Route path="books" element={
+            <Route path="/bms/books" element={
               <Suspense fallback={<LinearProgress />}>
                 <Books />
               </Suspense>
             } />
           </Route>
-          <Route path="/signin" element={
+          <Route path="/bms/signin" element={
             <Suspense fallback={<LinearProgress />}>
               <Signin />
             </Suspense>
           } />
-          <Route path="/signup" element={
+          <Route path="/bms/signup" element={
             <Suspense fallback={<LinearProgress />}>
               <Signup />
             </Suspense>
@@ -44,10 +48,8 @@ render(
         </Routes>
       </ErrorBoundary>
     </BrowserRouter>
-  </StrictMode>,
-  document.getElementById('root')
+  </StrictMode>
 );
-
 // If you want to start measuring performance in your app, pass a function
 // to log results (for example: reportWebVitals(console.log))
 // or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals

@@ -11,7 +11,7 @@ function Signup() {
     function handleSubbmit() {
         if (user !== "" && pwd !== "" && pwd === repwd) {
             console.log({ email: user, password: pwd });
-            navigate("/signin", { replace: true });
+            navigate("/bms/signin", { replace: true });
         }
     }
     return (
@@ -63,7 +63,7 @@ function Signup() {
                 >
                     Sign Up
                 </Button>
-                <Link component={RouterLink} to="/signin">Already have a account? Sign in</Link>
+                <Link component={RouterLink} to="/bms/signin">Already have a account? Sign in</Link>
             </Box>
         </Container>
     );

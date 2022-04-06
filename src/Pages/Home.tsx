@@ -20,7 +20,7 @@ function Home() {
             }}>
                 <Avatar sx={{ bgcolor: blue[400], height: 100, width: 100, mb: 3, fontSize: 70 }}>{u1}</Avatar>
                 <Typography variant='h4' component='p' sx={{ mb: 7 }}>Welcome, {username}</Typography>
-                <Grid container spacing={2}>
+                <Grid container spacing={2} mb={3}>
                     <Grid item xs={12}>
                         <Card>
                             <CardContent>

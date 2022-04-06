@@ -13,7 +13,7 @@ function Signin() {
             console.log({ email: user, password: pwd });
             localStorage.setItem("token", "123");
             localStorage.setItem("username", user);
-            navigate("/", { replace: true });
+            navigate("/bms", { replace: true });
         }
     }
     return (
@@ -60,7 +60,7 @@ function Signin() {
                 >
                     Sign In
                 </Button>
-                <Link component={RouterLink} to="/signup">Don't have a account? Sign up</Link>
+                <Link component={RouterLink} to="/bms/signup">Don't have a account? Sign up</Link>
             </Box>
         </Container>
     );

@@ -2,6 +2,7 @@
   "name": "bms_react18",
   "version": "0.1.0",
   "private": true,
+  "homepage": "/bms/",
   "dependencies": {
     "@emotion/react": "^11.9.0",
     "@emotion/styled": "^11.8.1",

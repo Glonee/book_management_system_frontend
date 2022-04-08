@@ -3,18 +3,14 @@ import {
 } from "@mui/material";
 import { useEffect } from "react";
 import { Outlet, useNavigate } from "react-router-dom";
+import { homepage, pages } from './config';
 function Base() {
     const navigate = useNavigate();
     useEffect(() => {
         if (localStorage.getItem("token") === null) {
-            navigate("/bms/signin", { replace: true });
+            navigate(`${homepage}/signin`, { replace: true });
         }
     });
-    const pages = [
-        { name: "Home", to: "/bms" },
-        { name: "Books", to: "/bms/books" },
-        { name: "Borrow", to: "/bms"}
-    ]
     return (
         <>
             <AppBar>
@@ -34,7 +30,7 @@ function Base() {
                         color="inherit"
                         onClick={() => {
                             localStorage.clear();
-                            navigate("/bms/signin", { replace: true });
+                            navigate(`${homepage}/signin`, { replace: true });
                         }}
                     >
                         LOGOUT

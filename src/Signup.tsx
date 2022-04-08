@@ -3,6 +3,7 @@ import {
 } from "@mui/material";
 import { useState } from "react";
 import { Link as RouterLink, useNavigate } from "react-router-dom";
+import { homepage } from './config';
 function Signup() {
     const [user, setUser] = useState("");
     const [pwd, setPwd] = useState("");
@@ -11,7 +12,7 @@ function Signup() {
     function handleSubbmit() {
         if (user !== "" && pwd !== "" && pwd === repwd) {
             console.log({ email: user, password: pwd });
-            navigate("/bms/signin", { replace: true });
+            navigate(`${homepage}/signin`, { replace: true });
         }
     }
     return (
@@ -58,12 +59,12 @@ function Signup() {
                     sx={{ mt: 2, mb: 3 }}
                     fullWidth
                     variant="contained"
-                    disabled={user === "" || pwd === "" || pwd !== repwd}
+                    disabled={user === "" || pwd.length < 8 || pwd !== repwd}
                     onClick={handleSubbmit}
                 >
                     Sign Up
                 </Button>
-                <Link component={RouterLink} to="/bms/signin">Already have a account? Sign in</Link>
+                <Link component={RouterLink} to={`${homepage}/signin`}>Already have a account? Sign in</Link>
             </Box>
         </Container>
     );

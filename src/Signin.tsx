@@ -4,6 +4,7 @@ import {
 import { blue } from "@mui/material/colors";
 import { useState } from "react";
 import { Link as RouterLink, useNavigate } from "react-router-dom";
+import { homepage } from './config';
 function Signin() {
     const [user, setUser] = useState("");
     const [pwd, setPwd] = useState("");
@@ -13,7 +14,7 @@ function Signin() {
             console.log({ email: user, password: pwd });
             localStorage.setItem("token", "123");
             localStorage.setItem("username", user);
-            navigate("/bms", { replace: true });
+            navigate(homepage === "" ? "/" : homepage, { replace: true });
         }
     }
     return (
@@ -60,7 +61,7 @@ function Signin() {
                 >
                     Sign In
                 </Button>
-                <Link component={RouterLink} to="/bms/signup">Don't have a account? Sign up</Link>
+                <Link component={RouterLink} to={`${homepage}/signup`}>Don't have a account? Sign up</Link>
             </Box>
         </Container>
     );

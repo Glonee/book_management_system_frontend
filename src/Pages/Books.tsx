@@ -6,7 +6,7 @@ const books = [
     { name: "PHP is the best", author: "Columbia", ISBN: 9876543, total: 3876, available: 4 }
 ]
 function Books() {
-    const [selected, setSelected] = useState(0);
+    const [select, setSelect] = useState(0);
     return (
         <>
             <CssBaseline />
@@ -26,8 +26,8 @@ function Books() {
                             <TableRow
                                 key={book.ISBN}
                                 hover
-                                selected={selected === book.ISBN}
-                                onClick={() => setSelected(sec => sec === book.ISBN ? 0 : book.ISBN)}
+                                selected={select === book.ISBN}
+                                onClick={() => setSelect(sec => sec === book.ISBN ? 0 : book.ISBN)}
                             >
                                 <TableCell>{book.name}</TableCell>
                                 <TableCell>{book.author}</TableCell>

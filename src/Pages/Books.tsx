@@ -4,8 +4,8 @@ const books = [
     { name: "Hello World", author: "Alex Ander", ISBN: 114514, total: 10, available: 4 },
     { name: "Javascript SUCKS", author: "Bicas Tomas", ISBN: 1919810, total: 7, available: 4 },
     { name: "PHP is the best", author: "Columbia", ISBN: 9876543, total: 3876, available: 4 }
-]
-function Books() {
+];
+function Books(): JSX.Element {
     const [select, setSelect] = useState(0);
     return (
         <>

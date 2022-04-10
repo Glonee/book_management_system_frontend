@@ -5,16 +5,22 @@ import { blue } from "@mui/material/colors";
 import { useState } from "react";
 import { Link as RouterLink, useNavigate } from "react-router-dom";
 import { homepage } from './config';
-function Signin() {
+function Signin({ mode }: { mode: "user" | "admin" }): JSX.Element {
     const [user, setUser] = useState("");
     const [pwd, setPwd] = useState("");
     const navigate = useNavigate();
-    function handleSubbmit() {
+    function handleSubbmit(): void {
         if (user !== "" && pwd !== "") {
             console.log({ email: user, password: pwd });
-            localStorage.setItem("token", "123");
-            localStorage.setItem("username", user);
-            navigate(homepage === "" ? "/" : homepage, { replace: true });
+            if (mode === "user") {
+                localStorage.setItem("token", "123");
+                localStorage.setItem("username", user);
+                navigate(homepage, { replace: true });
+            } else {
+                localStorage.setItem("admintoken", "123");
+                localStorage.setItem("adminusername", user);
+                navigate(homepage === "/" ? "/admin" : `${homepage}/admin`, { replace: true });
+            }
         }
     }
     return (
@@ -61,7 +67,9 @@ function Signin() {
                 >
                     Sign In
                 </Button>
-                <Link component={RouterLink} to={`${homepage}/signup`}>Don't have a account? Sign up</Link>
+                <Link component={RouterLink} to={mode === "user" ?
+                                (homepage === "/" ? "/signup" : `${homepage}/signup`)
+                                : (homepage === "/" ? "/admin/signup" : `${homepage}/admin/signup`)}>Don't have a account? Sign up</Link>
             </Box>
         </Container>
     );

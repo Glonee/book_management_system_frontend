@@ -4,16 +4,24 @@ import {
 import { useState } from "react";
 import { Link as RouterLink, useNavigate } from "react-router-dom";
 import { homepage } from './config';
-function Signup() {
+function Signup({ mode }: { mode: "admin" | "user" }): JSX.Element {
     const [user, setUser] = useState("");
     const [pwd, setPwd] = useState("");
     const [repwd, setRepwd] = useState("");
     const navigate = useNavigate();
-    function handleSubbmit() {
+    const isUseremail = isEmail(user);
+    function handleSubbmit(): void {
         if (user !== "" && pwd !== "" && pwd === repwd) {
             console.log({ email: user, password: pwd });
-            navigate(`${homepage}/signin`, { replace: true });
+            if (mode === "user") {
+                navigate(homepage === "/" ? "/signin" : `${homepage}/signin`, { replace: true });
+            } else {
+                navigate(homepage === "/" ? "/admin/signin" : `${homepage}/admin/signin`, { replace: true })
+            }
         }
+    }
+    function isEmail(text: string): boolean {
+        return /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/.test(text)
     }
     return (
         <Container component="main" maxWidth="xs">
@@ -26,6 +34,7 @@ function Signup() {
             }}>
                 <Typography component="h1" variant="h5">Sign up</Typography>
                 <TextField
+                    error={user !== "" && !isUseremail}
                     margin="normal"
                     fullWidth
                     label="Email"
@@ -34,6 +43,7 @@ function Signup() {
                     autoFocus
                     value={user}
                     onChange={e => setUser(e.target.value)}
+                    helperText={(user !== "" && !isUseremail) ? "Not a email" : ""}
                 />
                 <TextField
                     error={pwd !== "" && pwd.length < 8}
@@ -59,12 +69,14 @@ function Signup() {
                     sx={{ mt: 2, mb: 3 }}
                     fullWidth
                     variant="contained"
-                    disabled={user === "" || pwd.length < 8 || pwd !== repwd}
+                    disabled={user === "" || pwd.length < 8 || pwd !== repwd || !isUseremail}
                     onClick={handleSubbmit}
                 >
                     Sign Up
                 </Button>
-                <Link component={RouterLink} to={`${homepage}/signin`}>Already have a account? Sign in</Link>
+                <Link component={RouterLink} to={mode === "user" ?
+                    (homepage === "/" ? "/signin" : `${homepage}/signin`)
+                    : (homepage === "/" ? "/admin/signin" : `${homepage}/admin/signin`)}>Already have a account? Sign in</Link>
             </Box>
         </Container>
     );

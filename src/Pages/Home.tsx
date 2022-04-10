@@ -1,6 +1,6 @@
 import { Avatar, Container, Box, Typography, Grid, Card, CardContent, CardActions, Button, CssBaseline, List, ListItemText } from '@mui/material';
 import { blue } from '@mui/material/colors'
-function Home() {
+function Home(): JSX.Element {
     const u = localStorage.getItem("username");
     const username = u === null ? "?" : u;
     const u1 = username === "" ? "?" : username[0].toUpperCase();

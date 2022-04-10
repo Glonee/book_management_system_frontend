@@ -5,10 +5,10 @@ import '@fontsource/roboto/700.css';
 import { lazy } from 'react';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import Base from './Base';
-import ErrorBoundary from './ErrorBoundary';
-import NavigatePage from './NavigatePage';
 import { homepage } from './config';
-import AddFallBack from './AddFallBack';
+import ErrorBoundary from './ErrorBoundary';
+import FallBack from './FallBack';
+import NavigatePage from './NavigatePage';
 const Signin = lazy(() => import('./Signin'));
 const Signup = lazy(() => import('./Signup'));
 const Home = lazy(() => import('./Pages/Home'));
@@ -19,7 +19,9 @@ const userpages = [
     { name: "Borrow", to: homepage }
 ];
 const adminpages = [
-    { name: "Admin", to: homepage === "/" ? "/admin" : `${homepage}/admin` }
+    { name: "Admin", to: homepage === "/" ? "/admin" : `${homepage}/admin` },
+    { name: "Haha", to: homepage === "/" ? "/admin/home" : `${homepage}/admin/home` },
+    { name: "Hehe", to: homepage === "/" ? "/admin" : `${homepage}/admin` }
 ]
 function App(): JSX.Element {
     return (
@@ -29,17 +31,20 @@ function App(): JSX.Element {
                     <Route path="/" element={<NavigatePage />} />
                     <Route path={homepage}>
                         <Route element={<Base pages={userpages} mode="user" />} >
-                            <Route index element={<AddFallBack Component={<Home />} />} />
-                            <Route path="books" element={<AddFallBack Component={<Books />} />} />
+                            {/*Modify user page here*/}
+                            <Route index element={<FallBack><Home /></FallBack>} />
+                            <Route path="books" element={<FallBack><Books /></FallBack>} />
                         </Route>
-                        <Route path="signin" element={<AddFallBack Component={<Signin mode="user" />} />} />
-                        <Route path="signup" element={<AddFallBack Component={<Signup mode="user" />} />} />
+                        <Route path="signin" element={<FallBack><Signin mode="user" /></FallBack>} />
+                        <Route path="signup" element={<FallBack><Signup mode="user" /></FallBack>} />
                         <Route path="admin" >
                             <Route element={<Base pages={adminpages} mode="admin" />}>
-                                <Route index element={<AddFallBack Component={<Home />} />} />
+                                {/*Modify admin components here*/}
+                                <Route index element={<FallBack><Books /></FallBack>} />
+                                <Route path="home" element={<FallBack><Home /></FallBack>} />
                             </Route>
-                            <Route path="signin" element={<AddFallBack Component={<Signin mode="admin" />} />} />
-                            <Route path="signup" element={<AddFallBack Component={<Signup mode="admin" />} />} />
+                            <Route path="signin" element={<FallBack><Signin mode="admin" /></FallBack>} />
+                            <Route path="signup" element={<FallBack><Signup mode="admin" /></FallBack>} />
                         </Route>
                     </Route>
                     <Route path="/*" element={<p style={{ textAlign: "center", fontSize: 70 }}>PAGE NOT FOUND</p>} />

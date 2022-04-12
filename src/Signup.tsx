@@ -3,21 +3,40 @@ import {
 } from "@mui/material";
 import { useState } from "react";
 import { Link as RouterLink, useNavigate } from "react-router-dom";
-import { homepage } from './config';
+import { homepage, url } from './config';
 function Signup({ mode }: { mode: "admin" | "user" }): JSX.Element {
     const [user, setUser] = useState("");
+    const [email, setEmail] = useState("");
     const [pwd, setPwd] = useState("");
     const [repwd, setRepwd] = useState("");
     const navigate = useNavigate();
-    const isUseremail = isEmail(user);
+    const isUseremail = isEmail(email);
     function handleSubbmit(): void {
         if (user !== "" && pwd !== "" && pwd === repwd) {
             console.log({ email: user, password: pwd });
-            if (mode === "user") {
-                navigate(homepage === "/" ? "/signin" : `${homepage}/signin`, { replace: true });
-            } else {
-                navigate(homepage === "/" ? "/admin/signin" : `${homepage}/admin/signin`, { replace: true })
-            }
+            fetch(url, {
+                method: 'POST',
+                mode: 'cors',
+                body: JSON.stringify({
+                    action: "regist",
+                    username: user,
+                    email: email,
+                    password: pwd,
+                    birth: "2001-05-19"
+                })
+            })
+                .then(res => res.json(), err => console.log(err))
+                .then(obj => {
+                    if (obj !== undefined) {
+                        if (mode === "user") {
+                            navigate(homepage === "/" ? "/signin" : `${homepage}/signin`, { replace: true });
+                        } else {
+                            navigate(homepage === "/" ? "/admin/signin" : `${homepage}/admin/signin`, { replace: true })
+                        }
+                    } else {
+                        alert("ERROR!");
+                    }
+                })
         }
     }
     function isEmail(text: string): boolean {
@@ -34,16 +53,25 @@ function Signup({ mode }: { mode: "admin" | "user" }): JSX.Element {
             }}>
                 <Typography component="h1" variant="h5">Sign up</Typography>
                 <TextField
+                    margin="normal"
+                    fullWidth
+                    label="User name"
+                    autoComplete="account"
+                    type="text"
+                    autoFocus
+                    value={user}
+                    onChange={e => setUser(e.target.value)}
+                />
+                <TextField
                     error={user !== "" && !isUseremail}
                     margin="normal"
                     fullWidth
                     label="Email"
                     autoComplete="email"
                     type="email"
-                    autoFocus
-                    value={user}
-                    onChange={e => setUser(e.target.value)}
-                    helperText={(user !== "" && !isUseremail) ? "Not a email" : ""}
+                    value={email}
+                    onChange={e => setEmail(e.target.value)}
+                    helperText={(email !== "" && !isUseremail) ? "Not a email" : ""}
                 />
                 <TextField
                     error={pwd !== "" && pwd.length < 8}

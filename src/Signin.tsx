@@ -4,7 +4,7 @@ import {
 import { blue } from "@mui/material/colors";
 import { useState } from "react";
 import { Link as RouterLink, useNavigate } from "react-router-dom";
-import { homepage } from './config';
+import { homepage, url } from './config';
 function Signin({ mode }: { mode: "user" | "admin" }): JSX.Element {
     const [user, setUser] = useState("");
     const [pwd, setPwd] = useState("");
@@ -12,15 +12,36 @@ function Signin({ mode }: { mode: "user" | "admin" }): JSX.Element {
     function handleSubbmit(): void {
         if (user !== "" && pwd !== "") {
             console.log({ email: user, password: pwd });
+            fetch(url, {
+                method:'POST',
+                mode:'cors',
+                body:JSON.stringify({action: "login", username: user, password: pwd})
+            })
+            .then(res => res.json(), err => console.log(err))
+            .then(obj => {
+                if (obj != undefined && obj.state === 1) {
+                    localStorage.setItem("token", "123");
+                    localStorage.setItem("username", user);
+                    if (mode === "user") {
+                        navigate(homepage, { replace: true });
+                    } else {
+                        navigate(homepage === "/" ? "/admin" : `${homepage}/admin`, { replace: true });
+                    }
+                } else {
+                    alert("ERROR!")
+                }
+            })
+            /*
             if (mode === "user") {
                 localStorage.setItem("token", "123");
                 localStorage.setItem("username", user);
                 navigate(homepage, { replace: true });
             } else {
-                localStorage.setItem("admintoken", "123");
-                localStorage.setItem("adminusername", user);
+                localStorage.setItem("token", "123");
+                localStorage.setItem("username", user);
                 navigate(homepage === "/" ? "/admin" : `${homepage}/admin`, { replace: true });
             }
+            */
         }
     }
     return (
@@ -37,9 +58,9 @@ function Signin({ mode }: { mode: "user" | "admin" }): JSX.Element {
                 <TextField
                     margin="normal"
                     fullWidth
-                    label="Email"
-                    autoComplete="email"
-                    type="email"
+                    label="Account"
+                    autoComplete="account"
+                    type="text"
                     autoFocus
                     value={user}
                     onChange={e => setUser(e.target.value)}

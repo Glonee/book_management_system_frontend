@@ -7,15 +7,15 @@ import { homepage } from './config';
 function Base({ pages, mode }: { pages: { name: string, to: string }[], mode: "user" | "admin" }): JSX.Element {
     const navigate = useNavigate();
     useEffect(() => {
-        if (mode === "user") {
-            if (localStorage.getItem("token") === null) {
-                navigate(homepage === "/" ? "/signin" : `${homepage}/signin`, { replace: true });
-            }
-        } else {
-            if (localStorage.getItem("admintoken") === null) {
-                navigate(homepage === "/" ? "/admin/signin" : `${homepage}/admin/signin`, { replace: true });
-            }
+        //if (mode === "user") {
+        if (localStorage.getItem("token") === null) {
+            navigate(homepage === "/" ? "/signin" : `${homepage}/signin`, { replace: true });
         }
+        //} else {
+        //    if (localStorage.getItem("admintoken") === null) {
+        //        navigate(homepage === "/" ? "/admin/signin" : `${homepage}/admin/signin`, { replace: true });
+        //    }
+        //}
     });
     return (
         <>

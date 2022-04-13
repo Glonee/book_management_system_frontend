@@ -1,2 +1,2 @@
 export const homepage: string = "/bms";
-export const url = "https://121.40.111.167"
+export const url = "http://localhost:8080/Book_war_exploded";

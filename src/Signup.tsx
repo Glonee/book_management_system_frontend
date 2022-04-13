@@ -14,7 +14,7 @@ function Signup({ mode }: { mode: "admin" | "user" }): JSX.Element {
     function handleSubbmit(): void {
         if (user !== "" && pwd !== "" && pwd === repwd) {
             console.log({ email: user, password: pwd });
-            fetch(url, {
+            fetch(`${url}/user`, {
                 method: 'POST',
                 mode: 'cors',
                 body: JSON.stringify({
@@ -22,7 +22,9 @@ function Signup({ mode }: { mode: "admin" | "user" }): JSX.Element {
                     username: user,
                     email: email,
                     password: pwd,
-                    birth: "2001-05-19"
+                    birth: "2001-05-19",
+                    gender: "男",
+                    phone: "15831827855"
                 })
             })
                 .then(res => res.json(), err => console.log(err))

@@ -9,7 +9,10 @@ function Base({ pages, mode }: { pages: { name: string, to: string }[], mode: "u
     useEffect(() => {
         //if (mode === "user") {
         if (localStorage.getItem("token") === null) {
-            navigate(homepage === "/" ? "/signin" : `${homepage}/signin`, { replace: true });
+            if (mode === "user")
+                navigate(homepage === "/" ? "/signin" : `${homepage}/signin`, { replace: true });
+            else
+                navigate(homepage === "/" ? "/admin/signin" : `${homepage}/admin/signin`, { replace: true });
         }
         //} else {
         //    if (localStorage.getItem("admintoken") === null) {

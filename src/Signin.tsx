@@ -12,14 +12,14 @@ function Signin({ mode }: { mode: "user" | "admin" }): JSX.Element {
     function handleSubbmit(): void {
         if (user !== "" && pwd !== "") {
             console.log({ email: user, password: pwd });
-            fetch(url, {
+            fetch(`${url}/user`, {
                 method:'POST',
                 mode:'cors',
                 body:JSON.stringify({action: "login", username: user, password: pwd})
             })
             .then(res => res.json(), err => console.log(err))
             .then(obj => {
-                if (obj != undefined && obj.state === 1) {
+                if (obj !== undefined && obj.state === 1) {
                     localStorage.setItem("token", "123");
                     localStorage.setItem("username", user);
                     if (mode === "user") {

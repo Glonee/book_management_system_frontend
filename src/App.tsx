@@ -38,7 +38,7 @@ function App(): JSX.Element {
                         <Route element={<Base pages={userpages} mode="user" />} >
                             {/*Modify user page here*/}
                             <Route index element={<Sus><Home /></Sus>} />
-                            <Route path="books" element={<Sus><Books /></Sus>} />
+                            <Route path="books" element={<Sus><Books mode="user" /></Sus>} />
                             <Route path="borrow" element={<Sus><Borrow /></Sus>} />
                         </Route>
                         <Route path="signin" element={<Sus><Signin mode="user" /></Sus>} />
@@ -47,7 +47,7 @@ function App(): JSX.Element {
                             <Route element={<Base pages={adminpages} mode="admin" />}>
                                 {/*Modify admin components here*/}
                                 <Route index element={<Sus><Home /></Sus>} />
-                                <Route path="books" element={<Sus><Books /></Sus>} />
+                                <Route path="books" element={<Sus><Books mode="admin" /></Sus>} />
                                 <Route path="borrow" element={<Sus><Borrow /></Sus>} />
                                 <Route path="AddBooks" element={<Sus><AddBooks /></Sus>} />
                                 <Route path="ModBooks" element={<Sus><ModBooks /></Sus>} />

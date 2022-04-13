@@ -1,7 +1,7 @@
-import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, CssBaseline, Button } from '@mui/material';
+import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, CssBaseline, Button, TextField, Select } from '@mui/material';
 import { useEffect, useState } from 'react';
 import { url } from '../config';
-function Books(): JSX.Element {
+function Books({ mode }: { mode: "user" | "admin" }): JSX.Element {
     const [select, setSelect] = useState("");
     const [books, setBooks] = useState<{
         name: string,
@@ -12,9 +12,10 @@ function Books(): JSX.Element {
         num: number,
         price: number
     }[]>([]);
+    const [searchText, setSearchText] = useState("");
     useEffect(updateBooks, []);
     function updateBooks() {
-        fetch(url, {
+        fetch(`${url}/book`, {
             method: 'POST',
             mode: 'cors',
             body: JSON.stringify({ action: "listBooks" })
@@ -23,7 +24,7 @@ function Books(): JSX.Element {
             .then(obj => { if (obj !== undefined) { setBooks(obj) } })
     }
     function borrow(isbn: string) {
-        fetch(url, {
+        fetch(`${url}/user`, {
             method: 'POST',
             mode: 'cors',
             body: JSON.stringify({
@@ -32,11 +33,42 @@ function Books(): JSX.Element {
                 isbn: isbn,
                 num: 1
             })
-        }).then(() => updateBooks(), err => console.log(err));
+        }).then(res => res.json(), err => console.log(err))
+            .then(obj => {
+                if (obj !== undefined && obj.state === 0) {
+                    alert("success");
+                } else {
+                    alert("Fail");
+                }
+            });
+    }
+    function deleteBook(isbn: string) {
+        fetch(`${url}/book`, {
+            method: 'POST',
+            mode: 'cors',
+            body: JSON.stringify({ action: "deleteBook", isbn: isbn })
+        })
+            .then(res => res.json(), err => alert(err))
+            .then(obj => {
+                if (obj !== undefined && obj.state === 1) {
+                    alert("Success");
+                    updateBooks();
+                } else {
+                    alert("Failed")
+                }
+            })
     }
     return (
         <>
             <CssBaseline />
+            <TextField
+                margin="normal"
+                fullWidth
+                label="Search"
+                type="text"
+                value={searchText}
+                onChange={e => setSearchText(e.target.value)}
+            ></TextField>
             <TableContainer sx={{ mb: 3 }}>
                 <Table>
                     <TableHead>
@@ -45,10 +77,11 @@ function Books(): JSX.Element {
                             <TableCell>Author</TableCell>
                             <TableCell align='right'>ISBN</TableCell>
                             <TableCell align='right'>Num</TableCell>
+                            {mode === "admin" && <TableCell align='right'>Action</TableCell>}
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {books.map(book => (
+                        {books.filter(book => book.name.startsWith(searchText)).map(book => (
                             <TableRow
                                 key={book.isbn}
                                 hover
@@ -59,6 +92,9 @@ function Books(): JSX.Element {
                                 <TableCell>{book.author}</TableCell>
                                 <TableCell align='right'>{book.isbn}</TableCell>
                                 <TableCell align='right'>{book.num}</TableCell>
+                                {mode === "admin" && <TableCell align='right'>
+                                    <Button onClick={() => { deleteBook(book.isbn) }}>Delete</Button>
+                                </TableCell>}
                             </TableRow>
                         ))}
                     </TableBody>

@@ -1,14 +1,35 @@
 import { Avatar, Container, Box, Typography, Grid, Card, CardContent, CardActions, Button, CssBaseline, List, ListItemText } from '@mui/material';
 import { blue } from '@mui/material/colors'
+import { useEffect, useState } from 'react';
+import { url } from '../config';
 function Home(): JSX.Element {
     const u = localStorage.getItem("username");
     const username = u === null ? "?" : u;
     const u1 = username === "" ? "?" : username[0].toUpperCase();
-    const num = 1;
-    const messages = [
-        "You have 1 over due book!",
-        "The book you preordered is available now!"
-    ]
+    const [borrowed, setBorrowed] = useState<{
+        borrow_date: string,
+        deadline: string,
+        fine: number,
+        isbn: string,
+        name: string,
+        num: number
+    }[]>([]);
+    useEffect(updateBowered, []);
+    const overduebooks = borrowed.filter(book => book.fine !== 0).length;
+    const num = borrowed.length;
+    const messages = [`You have ${overduebooks} over due book!`];
+    function updateBowered() {
+        fetch(`${url}/user`, {
+            method: 'POST',
+            mode: 'cors',
+            body: JSON.stringify({
+                action: "getBorrowingList",
+                username: localStorage.getItem("username")
+            })
+        })
+            .then(res => res.json(), err => console.log(err))
+            .then(obj => { if (obj !== undefined) { setBorrowed(obj) } });
+    }
     return (
         <Container maxWidth="md" component="main">
             <CssBaseline />

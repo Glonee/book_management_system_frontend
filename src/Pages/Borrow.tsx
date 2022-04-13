@@ -10,11 +10,13 @@ function Borrow() {
         name: string,
         num: number
     }[]>([]);
+    const now = new Date();
+    const deadlines = borrowed.map((value, index) => (new Date(value.deadline)));
     useEffect(() => {
         updateBowered();
     }, []);
     function updateBowered() {
-        fetch(url, {
+        fetch(`${url}/user`, {
             method: 'POST',
             mode: 'cors',
             body: JSON.stringify({
@@ -26,7 +28,7 @@ function Borrow() {
             .then(obj => { if (obj !== undefined) { setBorrowed(obj) } });
     }
     function returnBook(isbn: string) {
-        fetch(url, {
+        fetch(`${url}/user`, {
             method: 'POST',
             mode: 'cors',
             body: JSON.stringify({
@@ -34,7 +36,7 @@ function Borrow() {
                 username: localStorage.getItem("username"),
                 isbn: isbn,
                 num: 1,
-                payfine: 0
+                payFine: 1
             })
         })
             .then(() => updateBowered(), err => console.log(err));
@@ -52,11 +54,12 @@ function Borrow() {
                             <TableCell>deadline</TableCell>
                             <TableCell align='right'>fine</TableCell>
                             <TableCell align='right'>num</TableCell>
+                            <TableCell align="right">remaining days</TableCell>
                             <TableCell>action</TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {borrowed.map(book => (
+                        {borrowed.map((book, index) => (
                             <TableRow
                                 key={book.isbn}
                                 hover
@@ -67,6 +70,8 @@ function Borrow() {
                                 <TableCell>{book.deadline}</TableCell>
                                 <TableCell align='right'>{book.fine}</TableCell>
                                 <TableCell align='right'>{book.num}</TableCell>
+                                <TableCell align="right">{((deadlines[index].getTime() - now.getTime()) / 1000 / 60 / 60 / 24) > 0 ?
+                                    (((deadlines[index].getTime() - now.getTime()) / 1000 / 60 / 60 / 24).toFixed(0)) : ("Over due")}</TableCell>
                                 <TableCell><Button onClick={() => returnBook(book.isbn)}>Return</Button></TableCell>
                             </TableRow>
                         ))}

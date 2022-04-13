@@ -13,13 +13,18 @@ function ModBooks() {
         num: ""
     })
     function handleSubbmit() {
-        fetch(url, {
+        fetch(`${url}/book`, {
             method: 'POST',
             mode: 'cors',
-            body: JSON.stringify({ ...info, action: "updateBook" })
+            body: JSON.stringify({ ...info, action: "updateBook", publish_date: "2001-05-19", position: "305-5-6" })
         })
             .then(res => res.json(), err => console.log(err))
-            .then(obj => { if (obj.state !== 1) alert("mod book error") });
+            .then(obj => {
+                if
+                    (obj.state !== 1) alert("mod book error")
+                else
+                    alert("Success");
+            });
     }
     return (
         <Container component="main" maxWidth="xs">
@@ -30,7 +35,6 @@ function ModBooks() {
                 flexDirection: "column",
                 marginTop: 10
             }}>
-                <Typography component="h1" variant="h5">Sign up</Typography>
                 <TextField
                     margin="normal"
                     fullWidth
@@ -76,7 +80,7 @@ function ModBooks() {
                     fullWidth
                     label="price"
                     type="number"
-                    value={info.isbn}
+                    value={info.price}
                     onChange={e => setInfo(p => ({ ...p, price: e.target.value }))}
                 />
                 <TextField

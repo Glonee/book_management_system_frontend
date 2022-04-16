@@ -4,15 +4,17 @@ import {
 import { useState } from "react";
 import { Link as RouterLink, useNavigate } from "react-router-dom";
 import { homepage, url } from './config';
-function Signup({ mode }: { mode: "admin" | "user" }): JSX.Element {
+function Signup(): JSX.Element {
     const [user, setUser] = useState("");
     const [email, setEmail] = useState("");
     const [pwd, setPwd] = useState("");
     const [repwd, setRepwd] = useState("");
+    const [loadding, setLoadding] = useState(false);
     const navigate = useNavigate();
     const isUseremail = isEmail(email);
     function handleSubbmit(): void {
         if (user !== "" && pwd !== "" && pwd === repwd) {
+            setLoadding(true);
             console.log({ email: user, password: pwd });
             fetch(`${url}/user`, {
                 method: 'POST',
@@ -22,21 +24,16 @@ function Signup({ mode }: { mode: "admin" | "user" }): JSX.Element {
                     username: user,
                     email: email,
                     password: pwd,
-                    birth: "2001-05-19",
-                    gender: "男",
-                    phone: "15831827855"
+                    birth: "2001-05-19"
                 })
             })
                 .then(res => res.json(), err => console.log(err))
                 .then(obj => {
                     if (obj !== undefined) {
-                        if (mode === "user") {
-                            navigate(homepage === "/" ? "/signin" : `${homepage}/signin`, { replace: true });
-                        } else {
-                            navigate(homepage === "/" ? "/admin/signin" : `${homepage}/admin/signin`, { replace: true })
-                        }
+                        navigate(homepage === "/" ? "/signin" : `${homepage}/signin`, { replace: true });
                     } else {
                         alert("ERROR!");
+                        setLoadding(false);
                     }
                 })
         }
@@ -65,7 +62,7 @@ function Signup({ mode }: { mode: "admin" | "user" }): JSX.Element {
                     onChange={e => setUser(e.target.value)}
                 />
                 <TextField
-                    error={user !== "" && !isUseremail}
+                    error={email !== "" && !isUseremail}
                     margin="normal"
                     fullWidth
                     label="Email"
@@ -99,14 +96,14 @@ function Signup({ mode }: { mode: "admin" | "user" }): JSX.Element {
                     sx={{ mt: 2, mb: 3 }}
                     fullWidth
                     variant="contained"
-                    disabled={user === "" || pwd.length < 8 || pwd !== repwd || !isUseremail}
+                    disabled={user === "" || pwd.length < 8 || pwd !== repwd || !isUseremail || loadding}
                     onClick={handleSubbmit}
                 >
                     Sign Up
                 </Button>
-                <Link component={RouterLink} to={mode === "user" ?
-                    (homepage === "/" ? "/signin" : `${homepage}/signin`)
-                    : (homepage === "/" ? "/admin/signin" : `${homepage}/admin/signin`)}>Already have a account? Sign in</Link>
+                <Link component={RouterLink} to={homepage === "/" ? "/signin" : `${homepage}/signin`}>
+                    Already have a account? Sign in
+                </Link>
             </Box>
         </Container>
     );

@@ -11,7 +11,7 @@ function Borrow() {
         num: number
     }[]>([]);
     const now = new Date();
-    const deadlines = borrowed.map((value, index) => (new Date(value.deadline)));
+    const remainings = borrowed.map(value => (new Date(value.deadline).getTime() - now.getTime()));
     useEffect(() => {
         updateBowered();
     }, []);
@@ -50,11 +50,11 @@ function Borrow() {
                         <TableRow>
                             <TableCell>Name</TableCell>
                             <TableCell>ISBN</TableCell>
-                            <TableCell>borrow_date</TableCell>
-                            <TableCell>deadline</TableCell>
-                            <TableCell align='right'>fine</TableCell>
-                            <TableCell align='right'>num</TableCell>
-                            <TableCell align="right">remaining days</TableCell>
+                            <TableCell>Borrow date</TableCell>
+                            <TableCell>Deadline</TableCell>
+                            <TableCell align='right'>Fine</TableCell>
+                            <TableCell align='right'>Num</TableCell>
+                            <TableCell align="right">Remaining days</TableCell>
                             <TableCell>action</TableCell>
                         </TableRow>
                     </TableHead>
@@ -70,8 +70,12 @@ function Borrow() {
                                 <TableCell>{book.deadline}</TableCell>
                                 <TableCell align='right'>{book.fine}</TableCell>
                                 <TableCell align='right'>{book.num}</TableCell>
-                                <TableCell align="right">{((deadlines[index].getTime() - now.getTime()) / 1000 / 60 / 60 / 24) > 0 ?
-                                    (((deadlines[index].getTime() - now.getTime()) / 1000 / 60 / 60 / 24).toFixed(0)) : ("Over due")}</TableCell>
+                                <TableCell align="right">{
+                                    remainings[index] > 0 ?
+                                        (remainings[index] / 1000 / 60 / 60 / 24).toFixed(0)
+                                        : "Over due"
+                                }
+                                </TableCell>
                                 <TableCell><Button onClick={() => returnBook(book.isbn)}>Return</Button></TableCell>
                             </TableRow>
                         ))}

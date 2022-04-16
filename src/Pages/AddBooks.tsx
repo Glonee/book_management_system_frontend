@@ -1,4 +1,4 @@
-import { Container, CssBaseline, Box, TextField, Button } from "@mui/material";
+import { Container, CssBaseline, Box, Typography, TextField, Button } from "@mui/material";
 import { useState } from "react";
 import { url } from '../config';
 function AddBooks() {
@@ -26,7 +26,7 @@ function AddBooks() {
             });
     }
     return (
-        <Container component="main" maxWidth="xs">
+        <Container component="main" maxWidth="md">
             <CssBaseline />
             <Box sx={{
                 alignItems: "center",

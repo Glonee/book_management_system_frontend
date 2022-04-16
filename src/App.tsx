@@ -42,7 +42,7 @@ function App(): JSX.Element {
                             <Route path="borrow" element={<Sus><Borrow /></Sus>} />
                         </Route>
                         <Route path="signin" element={<Sus><Signin mode="user" /></Sus>} />
-                        <Route path="signup" element={<Sus><Signup mode="user" /></Sus>} />
+                        <Route path="signup" element={<Sus><Signup /></Sus>} />
                         <Route path="admin" >
                             <Route element={<Base pages={adminpages} mode="admin" />}>
                                 {/*Modify admin components here*/}
@@ -53,7 +53,6 @@ function App(): JSX.Element {
                                 <Route path="ModBooks" element={<Sus><ModBooks /></Sus>} />
                             </Route>
                             <Route path="signin" element={<Sus><Signin mode="admin" /></Sus>} />
-                            <Route path="signup" element={<Sus><Signup mode="admin" /></Sus>} />
                         </Route>
                     </Route>
                     <Route path="/*" element={<p style={{ textAlign: "center", fontSize: 70 }}>PAGE NOT FOUND</p>} />

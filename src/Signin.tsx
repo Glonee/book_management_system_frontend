@@ -8,29 +8,32 @@ import { homepage, url } from './config';
 function Signin({ mode }: { mode: "user" | "admin" }): JSX.Element {
     const [user, setUser] = useState("");
     const [pwd, setPwd] = useState("");
+    const [loadding, setLoading] = useState(false);
     const navigate = useNavigate();
     function handleSubbmit(): void {
         if (user !== "" && pwd !== "") {
             console.log({ email: user, password: pwd });
+            setLoading(true);
             fetch(`${url}/user`, {
-                method:'POST',
-                mode:'cors',
-                body:JSON.stringify({action: "login", username: user, password: pwd})
+                method: 'POST',
+                mode: 'cors',
+                body: JSON.stringify({ action: "login", username: user, password: pwd })
             })
-            .then(res => res.json(), err => console.log(err))
-            .then(obj => {
-                if (obj !== undefined && obj.state === 1) {
-                    localStorage.setItem("token", "123");
-                    localStorage.setItem("username", user);
-                    if (mode === "user") {
-                        navigate(homepage, { replace: true });
+                .then(res => res.json(), err => console.log(err))
+                .then(obj => {
+                    if (obj !== undefined && obj.state === 1) {
+                        localStorage.setItem("token", "123");
+                        localStorage.setItem("username", user);
+                        if (mode === "user") {
+                            navigate(homepage, { replace: true });
+                        } else {
+                            navigate(homepage === "/" ? "/admin" : `${homepage}/admin`, { replace: true });
+                        }
                     } else {
-                        navigate(homepage === "/" ? "/admin" : `${homepage}/admin`, { replace: true });
+                        alert("ERROR!");
+                        setLoading(false);
                     }
-                } else {
-                    alert("ERROR!")
-                }
-            })
+                })
             /*
             if (mode === "user") {
                 localStorage.setItem("token", "123");
@@ -83,14 +86,16 @@ function Signin({ mode }: { mode: "user" | "admin" }): JSX.Element {
                     sx={{ mt: 2, mb: 3 }}
                     fullWidth
                     variant="contained"
-                    disabled={user === "" || pwd === ""}
+                    disabled={user === "" || pwd === "" || loadding}
                     onClick={handleSubbmit}
                 >
-                    Sign In
+                    {loadding ? "LOADDING" : "SIGN IN"}
                 </Button>
-                <Link component={RouterLink} to={mode === "user" ?
-                                (homepage === "/" ? "/signup" : `${homepage}/signup`)
-                                : (homepage === "/" ? "/admin/signup" : `${homepage}/admin/signup`)}>Don't have a account? Sign up</Link>
+                {mode === "user" &&
+                    <Link component={RouterLink} to={homepage === "/" ? "/signup" : `${homepage}/signup`}>
+                        Don't have a account? Sign up
+                    </Link>
+                }
             </Box>
         </Container>
     );

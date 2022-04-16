@@ -1,4 +1,4 @@
-import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, CssBaseline, Button, TextField } from '@mui/material';
+import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, CssBaseline, Button, TextField, Select } from '@mui/material';
 import { useEffect, useState } from 'react';
 import { url } from '../config';
 function Books({ mode }: { mode: "user" | "admin" }): JSX.Element {
@@ -10,7 +10,8 @@ function Books({ mode }: { mode: "user" | "admin" }): JSX.Element {
         publish: string,
         bclass: string,
         num: number,
-        price: number
+        price: number,
+        position: string
     }[]>([]);
     const [searchText, setSearchText] = useState("");
     useEffect(updateBooks, []);
@@ -75,6 +76,7 @@ function Books({ mode }: { mode: "user" | "admin" }): JSX.Element {
                         <TableRow>
                             <TableCell>Name</TableCell>
                             <TableCell>Author</TableCell>
+                            <TableCell>Position</TableCell>
                             <TableCell align='right'>ISBN</TableCell>
                             <TableCell align='right'>Num</TableCell>
                             {mode === "admin" && <TableCell align='right'>Action</TableCell>}
@@ -90,6 +92,7 @@ function Books({ mode }: { mode: "user" | "admin" }): JSX.Element {
                             >
                                 <TableCell>{book.name}</TableCell>
                                 <TableCell>{book.author}</TableCell>
+                                <TableCell>{book.position}</TableCell>
                                 <TableCell align='right'>{book.isbn}</TableCell>
                                 <TableCell align='right'>{book.num}</TableCell>
                                 {mode === "admin" && <TableCell align='right'>

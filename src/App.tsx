@@ -10,23 +10,28 @@ import ErrorBoundary from './ErrorBoundary';
 import Sus from './Sus';
 import NavigatePage from './NavigatePage';
 import Borrow from './Pages/Borrow';
+//以上为常规import，以下为懒加载import
+//懒加载（即打开这个页面时才加载）需要将懒加载组件包裹在Sus组件内才能使用
+//嫌麻烦可以不使用懒加载，直接import
 const Signin = lazy(() => import('./Signin'));
 const Signup = lazy(() => import('./Signup'));
 const Home = lazy(() => import('./Pages/Home'));
 const Books = lazy(() => import('./Pages/Books'));
 const AddBooks = lazy(() => import('./Pages/AddBooks'));
 const ModBooks = lazy(() => import('./Pages/ModBooks'));
+//用户的菜单栏
 const userpages = [
     { name: "Home", to: homepage },
-    { name: "Books", to: homepage === "/" ? "/books" : `${homepage}/books` },
-    { name: "Borrow", to: homepage === "/" ? "/borrow" : `${homepage}/borrow` }
+    { name: "Books", to: `${homepage}/books` },
+    { name: "Borrow", to: `${homepage}/borrow` }
 ];
+//管理员的菜单栏
 const adminpages = [
-    { name: "Home", to: homepage === "/" ? "/admin" : `${homepage}/admin` },
-    { name: "Books", to: homepage === "/" ? "/admin/books" : `${homepage}/admin/books` },
-    { name: "Borrow", to: homepage === "/" ? "/admin/borrow" : `${homepage}/admin/borrow` },
-    { name: "AddBooks", to: homepage === "/" ? "/admin/AddBooks" : `${homepage}/admin/AddBooks` },
-    { name: "ModBooks", to: homepage === "/" ? "/admin/ModBooks" : `${homepage}/admin/ModBooks` }
+    { name: "Home", to: `${homepage}/admin` },
+    { name: "Books", to: `${homepage}/admin/books` },
+    { name: "Borrow", to: `${homepage}/admin/borrow` },
+    { name: "AddBooks", to: `${homepage}/admin/AddBooks` },
+    { name: "ModBooks", to: `${homepage}/admin/ModBooks` }
 ]
 function App(): JSX.Element {
     return (
@@ -36,7 +41,7 @@ function App(): JSX.Element {
                     <Route path="/" element={<NavigatePage />} />
                     <Route path={homepage}>
                         <Route element={<Base pages={userpages} mode="user" />} >
-                            {/*Modify user page here*/}
+                            {/*用户可用的页面*/}
                             <Route index element={<Sus><Home /></Sus>} />
                             <Route path="books" element={<Sus><Books mode="user" /></Sus>} />
                             <Route path="borrow" element={<Sus><Borrow /></Sus>} />
@@ -45,7 +50,7 @@ function App(): JSX.Element {
                         <Route path="signup" element={<Sus><Signup /></Sus>} />
                         <Route path="admin" >
                             <Route element={<Base pages={adminpages} mode="admin" />}>
-                                {/*Modify admin components here*/}
+                                {/*管理员可用的页面*/}
                                 <Route index element={<Sus><Home /></Sus>} />
                                 <Route path="books" element={<Sus><Books mode="admin" /></Sus>} />
                                 <Route path="borrow" element={<Sus><Borrow /></Sus>} />

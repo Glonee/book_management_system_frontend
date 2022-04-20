@@ -1,3 +1,4 @@
+//应用主体。通常不需要修改这个文件，修改App.tsx就行
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import App from './App';

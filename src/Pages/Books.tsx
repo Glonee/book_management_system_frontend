@@ -1,18 +1,19 @@
-import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, CssBaseline, Button, TextField, Select } from '@mui/material';
+import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, CssBaseline, Button, TextField, Select, FormControl, Container, InputLabel, MenuItem } from '@mui/material';
 import { useEffect, useState } from 'react';
 import { url } from '../config';
 function Books({ mode }: { mode: "user" | "admin" }): JSX.Element {
     const [select, setSelect] = useState("");
-    const [books, setBooks] = useState<{
-        name: string,
-        author: string,
-        isbn: string,
-        publish: string,
-        bclass: string,
-        num: number,
-        price: number,
-        position: string
-    }[]>([]);
+    const [books, setBooks] = useState([{
+        name: "abc",
+        author: "bcd",
+        isbn: "cde",
+        publish: "def",
+        bclass: "fgh",
+        num: 3,
+        price: 4,
+        position: "haha"
+    }]);
+    const [selectBy, setSelectBy] = useState<keyof typeof books[0]>("name");
     const [searchText, setSearchText] = useState("");
     useEffect(updateBooks, []);
     function updateBooks() {
@@ -62,14 +63,32 @@ function Books({ mode }: { mode: "user" | "admin" }): JSX.Element {
     return (
         <>
             <CssBaseline />
-            <TextField
-                margin="normal"
-                fullWidth
-                label="Search"
-                type="text"
-                value={searchText}
-                onChange={e => setSearchText(e.target.value)}
-            ></TextField>
+            <Container maxWidth="md">
+                <FormControl
+                    sx={{ mt: 3, mb: 3, mr: 3, width: "20%" }}
+                >
+                    <InputLabel id="cata">Search by</InputLabel>
+                    <Select
+                        labelId='cata'
+                        id="cataselect"
+                        label="Search by"
+                        value={selectBy}
+                        onChange={e => setSelectBy(e.target.value as "name" | "author" | "isbn" | "publish" | "bclass" | "num" | "price" | "position")}
+                    >
+                        {Object.keys(books[0]).map(value => (
+                            <MenuItem key={value} value={value}>{value}</MenuItem>
+                        ))}
+                    </Select>
+                </FormControl>
+                <TextField
+                    sx={{ mt: 3, mb: 3, width: "75%" }}
+                    margin="normal"
+                    label="Search"
+                    type="text"
+                    value={searchText}
+                    onChange={e => setSearchText(e.target.value)}
+                ></TextField>
+            </Container>
             <TableContainer sx={{ mb: 3 }}>
                 <Table>
                     <TableHead>
@@ -83,7 +102,7 @@ function Books({ mode }: { mode: "user" | "admin" }): JSX.Element {
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {books.filter(book => book.name.startsWith(searchText)).map(book => (
+                        {books.filter(book => book[selectBy].toString().startsWith(searchText)).map(book => (
                             <TableRow
                                 key={book.isbn}
                                 hover

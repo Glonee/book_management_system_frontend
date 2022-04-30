@@ -17,7 +17,6 @@ const Signin = lazy(() => import('./Signin'));
 const Signup = lazy(() => import('./Signup'));
 const Home = lazy(() => import('./Pages/Home'));
 const Books = lazy(() => import('./Pages/Books'));
-const AddBooks = lazy(() => import('./Pages/AddBooks'));
 const ModBooks = lazy(() => import('./Pages/ModBooks'));
 //用户的菜单栏
 const userpages = [
@@ -30,7 +29,6 @@ const adminpages = [
     { name: "Home", to: `${homepage}/admin` },
     { name: "Books", to: `${homepage}/admin/books` },
     { name: "Borrow", to: `${homepage}/admin/borrow` },
-    { name: "AddBooks", to: `${homepage}/admin/AddBooks` },
     { name: "ModBooks", to: `${homepage}/admin/ModBooks` }
 ]
 function App(): JSX.Element {
@@ -54,7 +52,6 @@ function App(): JSX.Element {
                                 <Route index element={<Sus><Home /></Sus>} />
                                 <Route path="books" element={<Sus><Books mode="admin" /></Sus>} />
                                 <Route path="borrow" element={<Sus><Borrow /></Sus>} />
-                                <Route path="AddBooks" element={<Sus><AddBooks /></Sus>} />
                                 <Route path="ModBooks" element={<Sus><ModBooks /></Sus>} />
                             </Route>
                             <Route path="signin" element={<Sus><Signin mode="admin" /></Sus>} />

@@ -1,20 +1,47 @@
-import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, CssBaseline, Button, TextField, Select, FormControl, Container, InputLabel, MenuItem } from '@mui/material';
-import { useEffect, useState } from 'react';
+import {
+    Table,
+    TableBody,
+    TableCell,
+    TableContainer,
+    TableHead,
+    TableRow,
+    CssBaseline,
+    Button,
+    TextField,
+    Select,
+    FormControl,
+    Container,
+    InputLabel,
+    MenuItem,
+    Dialog,
+    DialogContent,
+    DialogTitle,
+    CircularProgress,
+    Grid
+} from '@mui/material';
+import { useEffect, useState, lazy, Suspense, useRef } from 'react';
 import { url } from '../config';
+const Barcode = lazy(() => import('../Barcode'));
+const AddBooks = lazy(() => import('./AddBooks'));
+const bookprto = {
+    name: "",
+    author: "",
+    isbn: "",
+    publish: "",
+    bclass: "",
+    num: 0,
+    price: 0,
+    position: ""
+};
+type book = typeof bookprto;
 function Books({ mode }: { mode: "user" | "admin" }): JSX.Element {
     const [select, setSelect] = useState("");
-    const [books, setBooks] = useState([{
-        name: "abc",
-        author: "bcd",
-        isbn: "cde",
-        publish: "def",
-        bclass: "fgh",
-        num: 3,
-        price: 4,
-        position: "haha"
-    }]);
-    const [selectBy, setSelectBy] = useState<keyof typeof books[0]>("name");
+    const [books, setBooks] = useState<book[]>([]);
+    const [selectBy, setSelectBy] = useState<keyof book>("name");
     const [searchText, setSearchText] = useState("");
+    const [openAddBooks, setOpenAddBooks] = useState(false);
+    const [barcode, setBarcode] = useState("");
+    const keys = Object.keys(bookprto) as (keyof book)[];
     useEffect(updateBooks, []);
     function updateBooks() {
         fetch(`${url}/book`, {
@@ -61,34 +88,62 @@ function Books({ mode }: { mode: "user" | "admin" }): JSX.Element {
             })
     }
     return (
-        <>
+        <Container maxWidth="md">
             <CssBaseline />
-            <Container maxWidth="md">
-                <FormControl
-                    sx={{ mt: 3, mb: 3, mr: 3, width: "20%" }}
+            {mode === "admin" && <>
+                <Button onClick={() => setOpenAddBooks(true)} variant="outlined" fullWidth>Add book</Button>
+                <Dialog
+                    open={openAddBooks}
+                    onClose={() => {
+                        setOpenAddBooks(false);
+                        setBarcode("");
+                    }}
                 >
-                    <InputLabel id="cata">Search by</InputLabel>
-                    <Select
-                        labelId='cata'
-                        id="cataselect"
-                        label="Search by"
-                        value={selectBy}
-                        onChange={e => setSelectBy(e.target.value as "name" | "author" | "isbn" | "publish" | "bclass" | "num" | "price" | "position")}
+                    <DialogTitle>
+                        {barcode === "" ? "Add book" : "Barcode"}
+                    </DialogTitle>
+                    <DialogContent>
+                        <Suspense fallback={<CircularProgress />}>
+                            {barcode === "" ?
+                                <AddBooks done={id => setBarcode(id)} /> :
+                                <Barcode data={barcode} />
+                            }
+                        </Suspense>
+                    </DialogContent>
+                </Dialog>
+            </>}
+            <Grid container spacing={2}>
+                <Grid item sm={3} xs={4}>
+                    <FormControl
+                        fullWidth
+                        sx={{ mb: 3, mt: 3 }}
                     >
-                        {Object.keys(books[0]).map(value => (
-                            <MenuItem key={value} value={value}>{value}</MenuItem>
-                        ))}
-                    </Select>
-                </FormControl>
-                <TextField
-                    sx={{ mt: 3, mb: 3, width: "75%" }}
-                    margin="normal"
-                    label="Search"
-                    type="text"
-                    value={searchText}
-                    onChange={e => setSearchText(e.target.value)}
-                ></TextField>
-            </Container>
+                        <InputLabel id="cata">Search by</InputLabel>
+                        <Select
+                            labelId='cata'
+                            id="cataselect"
+                            label="Search by"
+                            value={selectBy}
+                            onChange={e => setSelectBy(e.target.value as keyof book)}
+                        >
+                            {keys.map(value => (
+                                <MenuItem key={value} value={value}>{value}</MenuItem>
+                            ))}
+                        </Select>
+                    </FormControl>
+                </Grid>
+                <Grid item sm={9} xs={8}>
+                    <TextField
+                        sx={{ mt: 3, mb: 3 }}
+                        fullWidth
+                        margin="normal"
+                        label="Search"
+                        type="text"
+                        value={searchText}
+                        onChange={e => setSearchText(e.target.value)}
+                    ></TextField>
+                </Grid>
+            </Grid>
             <TableContainer sx={{ mb: 3 }}>
                 <Table>
                     <TableHead>
@@ -102,7 +157,7 @@ function Books({ mode }: { mode: "user" | "admin" }): JSX.Element {
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {books.filter(book => book[selectBy].toString().startsWith(searchText)).map(book => (
+                        {books.filter(book => book[selectBy].toString().includes(searchText)).map(book => (
                             <TableRow
                                 key={book.isbn}
                                 hover
@@ -127,7 +182,7 @@ function Books({ mode }: { mode: "user" | "admin" }): JSX.Element {
                 disabled={select === ""}
                 onClick={() => borrow(select)}
             >Borrow</Button>
-        </>
+        </Container>
     )
 }
 export default Books;

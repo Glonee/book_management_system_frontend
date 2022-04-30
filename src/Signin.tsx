@@ -6,21 +6,22 @@ import { blue } from "@mui/material/colors";
 import { useState } from "react";
 import { Link as RouterLink, useNavigate } from "react-router-dom";
 import { homepage, url } from './config';
+import Alert from "./Alert";
 function Signin({ mode }: { mode: "user" | "admin" }): JSX.Element {
     const [user, setUser] = useState("");
     const [pwd, setPwd] = useState("");
     const [loadding, setLoading] = useState(false);
+    const [alert, setAlert] = useState({ open: false, message: "" });
     const navigate = useNavigate();
     function handleSubbmit(): void {
         if (user !== "" && pwd !== "") {
-            console.log({ email: user, password: pwd });
             setLoading(true);
             fetch(`${url}/user`, {
                 method: 'POST',
                 mode: 'cors',
                 body: JSON.stringify({ action: "login", username: user, password: pwd })
             })
-                .then(res => res.json(), err => console.log(err))
+                .then(res => res.json())
                 .then(obj => {
                     if (obj !== undefined && obj.state === 1) {
                         localStorage.setItem("token", "123");
@@ -31,26 +32,25 @@ function Signin({ mode }: { mode: "user" | "admin" }): JSX.Element {
                             navigate(homepage === "/" ? "/admin" : `${homepage}/admin`, { replace: true });
                         }
                     } else {
-                        alert("ERROR!");
+                        setAlert({ open: true, message: "Wrong username or password" })
                         setLoading(false);
                     }
-                })
-            /*
-            if (mode === "user") {
-                localStorage.setItem("token", "123");
-                localStorage.setItem("username", user);
-                navigate(homepage, { replace: true });
-            } else {
-                localStorage.setItem("token", "123");
-                localStorage.setItem("username", user);
-                navigate(homepage === "/" ? "/admin" : `${homepage}/admin`, { replace: true });
-            }
-            */
+                }).catch(err => {
+                    console.log(err);
+                    setAlert({ open: true, message: "Can not contact server" })
+                    setLoading(false);
+                });
         }
     }
     return (
         <Container component="main" maxWidth="xs">
             <CssBaseline />
+            <Alert
+                open={alert.open}
+                onClose={() => setAlert(pre => ({ ...pre, open: false }))}
+                message={alert.message}
+                servrity="error"
+            />
             <Box sx={{
                 alignItems: "center",
                 display: "flex",

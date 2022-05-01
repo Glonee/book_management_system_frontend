@@ -1,9 +1,9 @@
-import { Container, CssBaseline, Box, TextField, Button, Grid, AlertColor, DialogActions, DialogContent, DialogTitle } from "@mui/material";
+import { AlertColor, Box, Button, DialogActions, DialogContent, DialogTitle, Grid, TextField } from "@mui/material";
+import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
+import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { useState } from "react";
-import { url, isbnapi, apikey } from '../config';
-import { LocalizationProvider, DatePicker } from "@mui/x-date-pickers";
-import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns'
 import Alert from "../Alert";
+import { apikey, isbnapi, url } from '../config';
 function AddBooks({ done }: { done: (id: string) => void }) {
     const [info, setInfo] = useState<{
         name: string;
@@ -28,11 +28,7 @@ function AddBooks({ done }: { done: (id: string) => void }) {
     });
     const [fetching, setFetching] = useState(false);
     const [loading, setLoading] = useState(false);
-    const [alertinfo, setAlertinfo] = useState<{
-        open: boolean,
-        servrity: AlertColor,
-        message: string
-    }>({ open: false, servrity: "error", message: "" });
+    const [alertinfo, setAlertinfo] = useState({ open: false, message: "" });
     function check(): boolean {
         return (
             info.author !== "" &&
@@ -63,17 +59,19 @@ function AddBooks({ done }: { done: (id: string) => void }) {
             .then(res => res.json())
             .then(
                 obj => {
-                    if (obj.state !== 1)
-                        setAlertinfo({ open: true, servrity: "error", message: "Add book error" });
-                    else
-                        setAlertinfo({ open: true, servrity: "success", message: "Success" });
-                    setLoading(false);
-                    done(info.isbn);
+                    if (obj.state !== 1) {
+                        setAlertinfo({ open: true, message: "Add book error" });
+                    } else {
+                        done(info.isbn);
+                        setLoading(false);
+                    }
+
                 },
                 err => {
                     console.log(err);
-                    setAlertinfo({ open: true, servrity: "error", message: "Network error" });
+                    setAlertinfo({ open: true, message: "Network error" });
                     setLoading(false);
+                    //done(info.isbn);
                 })
     }
     function getbookinfo() {
@@ -93,35 +91,34 @@ function AddBooks({ done }: { done: (id: string) => void }) {
                                 author: data.author == null ? "" : data.author,
                                 name: data.name == null ? "" : data.name,
                                 publish: data.publishing == null ? "" : data.publishing,
-                                price: data.price == null ? "" : data.price.match(/\d+(.\d+)?/g)[0],
+                                price: data.price == null ? "" : (data.price.match(/\d+(.\d+)?/g) == null ? "" : data.price.match(/\d+(.\d+)?/g)[0]),
                                 publish_date: (data.published != null && data.published !== "") ? new Date(data.published) : null
                             }))
                         } else {
-                            setAlertinfo({ open: true, message: "Book not found. Please add this book manully", servrity: "warning" });
+                            setAlertinfo({ open: true, message: "Book not found. Please add this book manully" });
                         }
                     } else {
-                        setAlertinfo({ open: true, message: "Book not found. Please add this book manully", servrity: "warning" });
+                        setAlertinfo({ open: true, message: "Book not found. Please add this book manully" });
                     }
                     setFetching(false);
                 },
                 err => {
                     console.log(err);
-                    setAlertinfo({ open: true, message: "Network error", servrity: "error" });
+                    setAlertinfo({ open: true, message: "Network error" });
                     setFetching(false);
                 }
             )
     }
     return (
         <>
+            <Alert
+                open={alertinfo.open}
+                onClose={() => setAlertinfo(pre => ({ ...pre, open: false }))}
+                message={alertinfo.message}
+                servrity="error"
+            />
             <DialogTitle>Add book</DialogTitle>
             <DialogContent>
-                <CssBaseline />
-                <Alert
-                    open={alertinfo.open}
-                    onClose={() => setAlertinfo(pre => ({ ...pre, open: false }))}
-                    message={alertinfo.message}
-                    servrity={alertinfo.servrity}
-                />
                 <Box sx={{
                     alignItems: "center",
                     display: "flex",

@@ -1,7 +1,5 @@
 //登录页
-import {
-    Avatar, Box, Button, Container, CssBaseline, Link, TextField, Typography
-} from "@mui/material";
+import { Avatar, Box, Button, Container, Link, TextField, Typography } from "@mui/material";
 import { blue } from "@mui/material/colors";
 import { useState } from "react";
 import { Link as RouterLink, useNavigate } from "react-router-dom";
@@ -44,7 +42,6 @@ function Signin({ mode }: { mode: "user" | "admin" }): JSX.Element {
     }
     return (
         <Container component="main" maxWidth="xs">
-            <CssBaseline />
             <Alert
                 open={alert.open}
                 onClose={() => setAlert(pre => ({ ...pre, open: false }))}

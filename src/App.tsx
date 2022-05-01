@@ -2,14 +2,15 @@ import '@fontsource/roboto/300.css';
 import '@fontsource/roboto/400.css';
 import '@fontsource/roboto/500.css';
 import '@fontsource/roboto/700.css';
+import { CssBaseline } from '@mui/material';
 import { lazy } from 'react';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import Base from './Base';
 import { homepage } from './config';
 import ErrorBoundary from './ErrorBoundary';
-import Sus from './Sus';
 import NavigatePage from './NavigatePage';
 import Borrow from './Pages/Borrow';
+import Sus from './Sus';
 //以上为常规import，以下为懒加载import
 //懒加载（即打开这个页面时才加载）需要将懒加载组件包裹在Suspense(或我已封装的Sus)组件内才能使用
 //嫌麻烦可以不使用懒加载，直接import
@@ -28,12 +29,12 @@ const userpages = [
 const adminpages = [
     { name: "Home", to: `${homepage}/admin` },
     { name: "Books", to: `${homepage}/admin/books` },
-    { name: "Borrow", to: `${homepage}/admin/borrow` },
-    { name: "ModBooks", to: `${homepage}/admin/ModBooks` }
+    { name: "Borrow", to: `${homepage}/admin/borrow` }
 ]
 function App(): JSX.Element {
     return (
         <BrowserRouter>
+            <CssBaseline />
             <ErrorBoundary>
                 <Routes>
                     <Route path="/" element={<NavigatePage />} />
@@ -52,7 +53,6 @@ function App(): JSX.Element {
                                 <Route index element={<Sus><Home /></Sus>} />
                                 <Route path="books" element={<Sus><Books mode="admin" /></Sus>} />
                                 <Route path="borrow" element={<Sus><Borrow mode="admin" /></Sus>} />
-                                <Route path="ModBooks" element={<Sus><ModBooks /></Sus>} />
                             </Route>
                             <Route path="signin" element={<Sus><Signin mode="admin" /></Sus>} />
                         </Route>

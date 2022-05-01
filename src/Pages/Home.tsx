@@ -1,4 +1,4 @@
-import { Avatar, Container, Box, Typography, Grid, Card, CardContent, CardActions, Button, CssBaseline, List, ListItemText } from '@mui/material';
+import { Avatar, Container, Box, Typography, Grid, Card, CardContent, CardActions, Button, List, ListItemText } from '@mui/material';
 import { blue } from '@mui/material/colors'
 import { useEffect, useState } from 'react';
 import { url } from '../config';
@@ -37,7 +37,6 @@ function Home(): JSX.Element {
     }
     return (
         <Container maxWidth="md" component="main">
-            <CssBaseline />
             <Alert
                 message='Network error'
                 open={open}
@@ -106,6 +105,5 @@ function Home(): JSX.Element {
             </Box>
         </Container>
     )
-
 }
 export default Home;

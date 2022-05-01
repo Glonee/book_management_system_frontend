@@ -1,4 +1,4 @@
-import { AlertColor, Button, Dialog, DialogActions, DialogContent, DialogTitle, Typography } from "@mui/material";
+import { Button, DialogActions, DialogContent, DialogTitle, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
 import { url } from "../config";
 import { book as typeofbook } from "./Books";
@@ -31,6 +31,7 @@ export default function BorrowConfirm({ isbn, done }: { isbn: string, done: (id:
                 err => {
                     console.log(err);
                     setAlertinfo({ open: true, message: "Network error" });
+                    setLoading(false);
                 }
             )
     }, [isbn]);

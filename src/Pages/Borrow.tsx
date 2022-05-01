@@ -1,4 +1,4 @@
-import { CssBaseline, TableContainer, Table, TableHead, TableRow, TableCell, TableBody, Button } from '@mui/material';
+import { TableContainer, Table, TableHead, TableRow, TableCell, TableBody, Button } from '@mui/material';
 import { useEffect, useState } from 'react';
 import { url } from '../config';
 import Alert from '../Alert';
@@ -58,7 +58,6 @@ function Borrow({ mode }: { mode: "user" | "admin" }) {
     }
     return (
         <>
-            <CssBaseline />
             <Alert
                 open={alertinfo.open}
                 onClose={() => setAlertinfo(pre => ({ ...pre, open: false }))}

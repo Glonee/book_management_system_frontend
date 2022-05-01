@@ -1,7 +1,5 @@
 //菜单栏
-import {
-    AppBar, Button, Toolbar, Box
-} from "@mui/material";
+import { AppBar, Button, Toolbar, Box } from "@mui/material";
 import { useEffect } from "react";
 import { Outlet, useNavigate } from "react-router-dom";
 import { homepage } from './config';

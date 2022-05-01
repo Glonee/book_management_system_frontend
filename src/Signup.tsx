@@ -1,7 +1,5 @@
 //注册页
-import {
-    Box, Button, Container, CssBaseline, Link, TextField, Typography
-} from "@mui/material";
+import { Box, Button, Container, Link, TextField, Typography } from "@mui/material";
 import { useState } from "react";
 import { Link as RouterLink, useNavigate } from "react-router-dom";
 import { homepage, url } from './config';
@@ -44,7 +42,6 @@ function Signup(): JSX.Element {
     }
     return (
         <Container component="main" maxWidth="xs">
-            <CssBaseline />
             <Box sx={{
                 alignItems: "center",
                 display: "flex",

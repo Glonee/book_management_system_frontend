@@ -1,7 +1,8 @@
 import { CssBaseline, TableContainer, Table, TableHead, TableRow, TableCell, TableBody, Button } from '@mui/material';
 import { useEffect, useState } from 'react';
 import { url } from '../config';
-function Borrow() {
+import Alert from '../Alert';
+function Borrow({ mode }: { mode: "user" | "admin" }) {
     const [borrowed, setBorrowed] = useState<{
         borrow_date: string,
         deadline: string,
@@ -12,6 +13,7 @@ function Borrow() {
     }[]>([]);
     const now = new Date();
     const remainings = borrowed.map(value => (new Date(value.deadline).getTime() - now.getTime()));
+    const [alertinfo, setAlertinfo] = useState({ open: false, message: "" });
     useEffect(() => {
         updateBowered();
     }, []);
@@ -24,8 +26,14 @@ function Borrow() {
                 username: localStorage.getItem("username")
             })
         })
-            .then(res => res.json(), err => console.log(err))
-            .then(obj => { if (obj !== undefined) { setBorrowed(obj) } });
+            .then(res => res.json())
+            .then(
+                obj => { if (obj !== undefined) { setBorrowed(obj) } },
+                err => {
+                    console.log(err);
+                    setAlertinfo({ open: true, message: "Network error" });
+                }
+            );
     }
     function returnBook(isbn: string) {
         fetch(`${url}/user`, {
@@ -39,11 +47,24 @@ function Borrow() {
                 payFine: 1
             })
         })
-            .then(() => updateBowered(), err => console.log(err));
+            .then(res => res.json())
+            .then(
+                () => updateBowered(),
+                err => {
+                    console.log(err);
+                    setAlertinfo({ open: true, message: "Network error" })
+                }
+            )
     }
     return (
         <>
             <CssBaseline />
+            <Alert
+                open={alertinfo.open}
+                onClose={() => setAlertinfo(pre => ({ ...pre, open: false }))}
+                message={alertinfo.message}
+                servrity="error"
+            />
             <TableContainer>
                 <Table>
                     <TableHead>
@@ -55,7 +76,7 @@ function Borrow() {
                             <TableCell align='right'>Fine</TableCell>
                             <TableCell align='right'>Num</TableCell>
                             <TableCell align="right">Remaining days</TableCell>
-                            <TableCell>action</TableCell>
+                            {mode === "admin" && <TableCell>action</TableCell>}
                         </TableRow>
                     </TableHead>
                     <TableBody>
@@ -76,7 +97,7 @@ function Borrow() {
                                         : "Over due"
                                 }
                                 </TableCell>
-                                <TableCell><Button onClick={() => returnBook(book.isbn)}>Return</Button></TableCell>
+                                {mode === "admin" && <TableCell><Button onClick={() => returnBook(book.isbn)}>Return</Button></TableCell>}
                             </TableRow>
                         ))}
                     </TableBody>

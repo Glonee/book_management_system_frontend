@@ -2,10 +2,9 @@ import { Avatar, Container, Box, Typography, Grid, Card, CardContent, CardAction
 import { blue } from '@mui/material/colors'
 import { useEffect, useState } from 'react';
 import { url } from '../config';
+import Alert from '../Alert';
 function Home(): JSX.Element {
-    const u = localStorage.getItem("username");
-    const username = u === null ? "?" : u;
-    const u1 = username === "" ? "?" : username[0].toUpperCase();
+    const [open, setOpen] = useState(false);
     const [borrowed, setBorrowed] = useState<{
         borrow_date: string,
         deadline: string,
@@ -14,6 +13,9 @@ function Home(): JSX.Element {
         name: string,
         num: number
     }[]>([]);
+    const u = localStorage.getItem("username");
+    const username = u === null ? "?" : u;
+    const u1 = username === "" ? "?" : username[0].toUpperCase();
     useEffect(updateBowered, []);
     const overduebooks = borrowed.filter(book => book.fine !== 0).length;
     const num = borrowed.length;
@@ -27,12 +29,21 @@ function Home(): JSX.Element {
                 username: localStorage.getItem("username")
             })
         })
-            .then(res => res.json(), err => console.log(err))
-            .then(obj => { if (obj !== undefined) { setBorrowed(obj) } });
+            .then(res => res.json())
+            .then(
+                obj => { if (obj !== undefined) { setBorrowed(obj) } },
+                err => { console.log(err); setOpen(true); }
+            );
     }
     return (
         <Container maxWidth="md" component="main">
             <CssBaseline />
+            <Alert
+                message='Network error'
+                open={open}
+                onClose={() => setOpen(false)}
+                servrity='error'
+            />
             <Box sx={{
                 alignItems: "center",
                 display: "flex",

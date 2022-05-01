@@ -11,7 +11,7 @@ import Sus from './Sus';
 import NavigatePage from './NavigatePage';
 import Borrow from './Pages/Borrow';
 //以上为常规import，以下为懒加载import
-//懒加载（即打开这个页面时才加载）需要将懒加载组件包裹在Sus组件内才能使用
+//懒加载（即打开这个页面时才加载）需要将懒加载组件包裹在Suspense(或我已封装的Sus)组件内才能使用
 //嫌麻烦可以不使用懒加载，直接import
 const Signin = lazy(() => import('./Signin'));
 const Signup = lazy(() => import('./Signup'));
@@ -42,7 +42,7 @@ function App(): JSX.Element {
                             {/*用户可用的页面*/}
                             <Route index element={<Sus><Home /></Sus>} />
                             <Route path="books" element={<Sus><Books mode="user" /></Sus>} />
-                            <Route path="borrow" element={<Sus><Borrow /></Sus>} />
+                            <Route path="borrow" element={<Sus><Borrow mode="user" /></Sus>} />
                         </Route>
                         <Route path="signin" element={<Sus><Signin mode="user" /></Sus>} />
                         <Route path="signup" element={<Sus><Signup /></Sus>} />
@@ -51,7 +51,7 @@ function App(): JSX.Element {
                                 {/*管理员可用的页面*/}
                                 <Route index element={<Sus><Home /></Sus>} />
                                 <Route path="books" element={<Sus><Books mode="admin" /></Sus>} />
-                                <Route path="borrow" element={<Sus><Borrow /></Sus>} />
+                                <Route path="borrow" element={<Sus><Borrow mode="admin" /></Sus>} />
                                 <Route path="ModBooks" element={<Sus><ModBooks /></Sus>} />
                             </Route>
                             <Route path="signin" element={<Sus><Signin mode="admin" /></Sus>} />

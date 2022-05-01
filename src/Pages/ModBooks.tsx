@@ -1,6 +1,7 @@
-import { Container, CssBaseline, Box, TextField, Button } from "@mui/material";
+import { Container, CssBaseline, Box, TextField, Button, AlertColor } from "@mui/material";
 import { useState } from "react";
 import { url } from '../config';
+import Alert from "../Alert";
 function ModBooks() {
     const [info, setInfo] = useState({
         name: "",
@@ -9,9 +10,15 @@ function ModBooks() {
         isbn: "",
         publish: "",
         price: "",
+        publish_date: "",
         bclass: "",
         num: ""
-    })
+    });
+    const [alertinfo, setAlertinfo] = useState<{
+        open: boolean,
+        message: string,
+        servrity: AlertColor
+    }>({ open: false, message: "", servrity: "error" });
     function handleSubbmit() {
         fetch(`${url}/book`, {
             method: 'POST',
@@ -19,16 +26,28 @@ function ModBooks() {
             body: JSON.stringify({ ...info, action: "updateBook", publish_date: "2001-05-19", position: "305-5-6" })
         })
             .then(res => res.json(), err => console.log(err))
-            .then(obj => {
-                if
-                    (obj.state !== 1) alert("mod book error")
-                else
-                    alert("Success");
-            });
+            .then(
+                obj => {
+                    if (obj.state !== 1)
+                        setAlertinfo({ open: true, message: "Add book error", servrity: "error" });
+                    else
+                        setAlertinfo({ open: true, message: "Success", servrity: "success" });
+                },
+                err => {
+                    console.log(err);
+                    setAlertinfo({ open: true, message: "Network error", servrity: "error" });
+                }
+            );
     }
     return (
-        <Container component="main" maxWidth="md">
+        <Container component="main" maxWidth="sm">
             <CssBaseline />
+            <Alert
+                message={alertinfo.message}
+                open={alertinfo.open}
+                onClose={() => setAlertinfo(pre => ({ ...pre, open: false }))}
+                servrity={alertinfo.servrity}
+            />
             <Box sx={{
                 alignItems: "center",
                 display: "flex",

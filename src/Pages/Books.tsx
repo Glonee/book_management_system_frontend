@@ -17,12 +17,16 @@ import {
     DialogContent,
     DialogTitle,
     CircularProgress,
-    Grid
+    Grid,
+    AlertColor
 } from '@mui/material';
-import { useEffect, useState, lazy, Suspense, useRef } from 'react';
+import { useEffect, useState, lazy, Suspense } from 'react';
 import { url } from '../config';
+import Alert from '../Alert';
 const Barcode = lazy(() => import('../Barcode'));
 const AddBooks = lazy(() => import('./AddBooks'));
+const BorrowConfirm = lazy(() => import('./BorrowConfirmPage'));
+const ModBooks = lazy(() => import('./ModBooks'));
 const bookprto = {
     name: "",
     author: "",
@@ -31,87 +35,116 @@ const bookprto = {
     bclass: "",
     num: 0,
     price: 0,
-    position: ""
+    position: "",
+    publish_date: ""
 };
-type book = typeof bookprto;
+export type book = typeof bookprto;
 function Books({ mode }: { mode: "user" | "admin" }): JSX.Element {
     const [select, setSelect] = useState("");
-    const [books, setBooks] = useState<book[]>([]);
+    const [books, setBooks] = useState<book[]>([{
+        "author": "author0",
+        bclass: "文学类",
+        isbn: "11111111",
+        name: "bookname0",
+        num: 59,
+        position: "101-05-01",
+        price: 20,
+        publish: "商务印书馆",
+        publish_date: "2001-01-01"
+    }]);
+    const [openBorrow, setOpenBorrow] = useState(false);
     const [selectBy, setSelectBy] = useState<keyof book>("name");
     const [searchText, setSearchText] = useState("");
     const [openAddBooks, setOpenAddBooks] = useState(false);
     const [barcode, setBarcode] = useState("");
+    const [alertinfo, setAlertinfo] = useState<{
+        open: boolean,
+        message: string,
+        serivity: AlertColor
+    }>({ open: false, message: "", serivity: 'error' });
+    const [loading, setLoading] = useState(false);
     const keys = Object.keys(bookprto) as (keyof book)[];
     useEffect(updateBooks, []);
     function updateBooks() {
+        setLoading(true);
         fetch(`${url}/book`, {
             method: 'POST',
             mode: 'cors',
             body: JSON.stringify({ action: "listBooks" })
         })
-            .then(res => res.json(), err => console.log(err))
-            .then(obj => { if (obj !== undefined) { setBooks(obj) } })
-    }
-    function borrow(isbn: string) {
-        fetch(`${url}/user`, {
-            method: 'POST',
-            mode: 'cors',
-            body: JSON.stringify({
-                action: "borrow",
-                username: localStorage.getItem("username"),
-                isbn: isbn,
-                num: 1
-            })
-        }).then(res => res.json(), err => console.log(err))
-            .then(obj => {
-                if (obj !== undefined && obj.state === 0) {
-                    alert("success");
-                } else {
-                    alert("Fail");
+            .then(res => res.json())
+            .then(
+                obj => { setBooks(obj); setLoading(false); },
+                err => {
+                    console.log(err);
+                    setAlertinfo({ open: true, message: "Network error", serivity: "error" });
+                    setLoading(false);
                 }
-            });
+            )
     }
     function deleteBook(isbn: string) {
+        setLoading(true);
         fetch(`${url}/book`, {
             method: 'POST',
             mode: 'cors',
             body: JSON.stringify({ action: "deleteBook", isbn: isbn })
         })
-            .then(res => res.json(), err => alert(err))
-            .then(obj => {
-                if (obj !== undefined && obj.state === 1) {
-                    alert("Success");
-                    updateBooks();
-                } else {
-                    alert("Failed")
+            .then(res => res.json())
+            .then(
+                obj => {
+                    if (obj.state === 1) {
+                        setAlertinfo({ open: true, message: "Success", serivity: 'success' });
+                        updateBooks();
+                    } else {
+                        setAlertinfo({ open: true, message: "Fail", serivity: "error" });
+                    }
+                    setLoading(false);
+                },
+                err => {
+                    console.log(err);
+                    setAlertinfo({ open: true, message: "Network error", serivity: "error" });
+                    setLoading(false);
                 }
-            })
+            )
     }
     return (
-        <Container maxWidth="md">
+        <Container maxWidth="lg">
             <CssBaseline />
-            {mode === "admin" && <>
-                <Button onClick={() => setOpenAddBooks(true)} variant="outlined" fullWidth>Add book</Button>
+            <Alert
+                open={alertinfo.open}
+                onClose={() => setAlertinfo(pre => ({ ...pre, open: false }))}
+                message={alertinfo.message}
+                servrity={alertinfo.serivity}
+            />
+            <Dialog
+                open={barcode !== ""}
+                onClose={() => setBarcode("")}
+            >
+                <DialogTitle>Barcode</DialogTitle>
+                <DialogContent>
+                    <Suspense fallback={<CircularProgress />}>
+                        <Barcode data={barcode} />
+                    </Suspense>
+                </DialogContent>
+            </Dialog>
+            <Dialog
+                open={openBorrow}
+                onClose={() => setOpenBorrow(false)}
+            >
+                <Suspense fallback={<CircularProgress />}>
+                    <BorrowConfirm isbn={select} done={id => { setBarcode(id); updateBooks(); setOpenBorrow(false); }} />
+                </Suspense>
+            </Dialog>
+            {mode === "admin" &&
                 <Dialog
                     open={openAddBooks}
-                    onClose={() => {
-                        setOpenAddBooks(false);
-                        setBarcode("");
-                    }}
+                    onClose={() => setOpenAddBooks(false)}
                 >
-                    <DialogTitle>
-                        {barcode === "" ? "Add book" : "Barcode"}
-                    </DialogTitle>
-                    <DialogContent>
-                        <Suspense fallback={<CircularProgress />}>
-                            {barcode === "" ?
-                                <AddBooks done={id => setBarcode(id)} /> :
-                                <Barcode data={barcode} />
-                            }
-                        </Suspense>
-                    </DialogContent>
+                    <Suspense fallback={<CircularProgress />}>
+                        <AddBooks done={id => { setBarcode(id); updateBooks(); setOpenAddBooks(false); }} />
+                    </Suspense>
                 </Dialog>
-            </>}
+            }
             <Grid container spacing={2}>
                 <Grid item sm={3} xs={4}>
                     <FormControl
@@ -151,9 +184,10 @@ function Books({ mode }: { mode: "user" | "admin" }): JSX.Element {
                             <TableCell>Name</TableCell>
                             <TableCell>Author</TableCell>
                             <TableCell>Position</TableCell>
+                            <TableCell align='right'>Bclass</TableCell>
+                            <TableCell align='right'>Publish date</TableCell>
                             <TableCell align='right'>ISBN</TableCell>
                             <TableCell align='right'>Num</TableCell>
-                            {mode === "admin" && <TableCell align='right'>Action</TableCell>}
                         </TableRow>
                     </TableHead>
                     <TableBody>
@@ -167,21 +201,15 @@ function Books({ mode }: { mode: "user" | "admin" }): JSX.Element {
                                 <TableCell>{book.name}</TableCell>
                                 <TableCell>{book.author}</TableCell>
                                 <TableCell>{book.position}</TableCell>
+                                <TableCell align='right'>{book.bclass}</TableCell>
+                                <TableCell align='right'>{book.publish_date}</TableCell>
                                 <TableCell align='right'>{book.isbn}</TableCell>
                                 <TableCell align='right'>{book.num}</TableCell>
-                                {mode === "admin" && <TableCell align='right'>
-                                    <Button onClick={() => { deleteBook(book.isbn) }}>Delete</Button>
-                                </TableCell>}
                             </TableRow>
                         ))}
                     </TableBody>
                 </Table >
             </TableContainer>
-            <Button
-                variant='outlined'
-                disabled={select === ""}
-                onClick={() => borrow(select)}
-            >Borrow</Button>
         </Container>
     )
 }

@@ -1,9 +1,12 @@
-import { TableContainer, Table, TableHead, TableRow, TableCell, TableBody, Button } from '@mui/material';
+import { TableContainer, Table, TableHead, TableRow, TableCell, TableBody, Button, TextField, Grid, Container, Dialog, DialogTitle, DialogContent, Typography, DialogActions } from '@mui/material';
 import { useEffect, useState } from 'react';
 import { url } from '../config';
 import Alert from '../Alert';
+import code from '../img/code.jpg'
 function Borrow({ mode }: { mode: "user" | "admin" }) {
+    const [username, setUsername] = useState("");
     const [borrowed, setBorrowed] = useState<{
+        bookid: string,
         borrow_date: string,
         deadline: string,
         fine: number,
@@ -11,13 +14,9 @@ function Borrow({ mode }: { mode: "user" | "admin" }) {
         name: string,
         num: number
     }[]>([]);
-    const now = new Date();
-    const remainings = borrowed.map(value => (new Date(value.deadline).getTime() - now.getTime()));
     const [alertinfo, setAlertinfo] = useState({ open: false, message: "" });
+    const [openPayFine, setOpenPayFine] = useState(false);
     useEffect(() => {
-        updateBowered();
-    }, []);
-    function updateBowered() {
         fetch(`${url}/user`, {
             method: 'POST',
             mode: 'cors',
@@ -28,23 +27,41 @@ function Borrow({ mode }: { mode: "user" | "admin" }) {
         })
             .then(res => res.json())
             .then(
-                obj => { if (obj !== undefined) { setBorrowed(obj) } },
+                obj => setBorrowed(obj),
+                err => {
+                    console.log(err);
+                    setAlertinfo({ open: true, message: "Network error" });
+                }
+            );
+    }, []);
+    const now = new Date();
+    const remainings = borrowed.map(value => (new Date(value.deadline).getTime() - now.getTime()));
+    function updateBowered() {
+        fetch(`${url}/user`, {
+            method: 'POST',
+            mode: 'cors',
+            body: JSON.stringify({
+                action: "getBorrowingList",
+                username: username
+            })
+        })
+            .then(res => res.json())
+            .then(
+                obj => setBorrowed(obj),
                 err => {
                     console.log(err);
                     setAlertinfo({ open: true, message: "Network error" });
                 }
             );
     }
-    function returnBook(isbn: string) {
+    function returnBook(isbn: string, bookid: string) {
         fetch(`${url}/user`, {
             method: 'POST',
             mode: 'cors',
             body: JSON.stringify({
                 action: "returnBook",
-                username: localStorage.getItem("username"),
                 isbn: isbn,
-                num: 1,
-                payFine: 1
+                bookid: bookid
             })
         })
             .then(res => res.json())
@@ -57,13 +74,51 @@ function Borrow({ mode }: { mode: "user" | "admin" }) {
             )
     }
     return (
-        <>
+        <Container component="main" maxWidth="lg">
             <Alert
                 open={alertinfo.open}
                 onClose={() => setAlertinfo(pre => ({ ...pre, open: false }))}
                 message={alertinfo.message}
                 servrity="error"
             />
+            {mode === "admin" &&
+                <Grid container spacing={2}>
+                    <Dialog
+                        open={openPayFine}
+                        onClose={() => setOpenPayFine(false)}
+                    >
+                        <DialogTitle>Pay fine with Alipay</DialogTitle>
+                        <DialogContent >
+                            <img src={code} style={{ height: 370, width: 370 }} />
+                        </DialogContent>
+                        <DialogActions>
+                            <Button onClick={() => setOpenPayFine(false)}>Done</Button>
+                        </DialogActions>
+                    </Dialog>
+                    <Grid item md={10} xs={8}>
+                        <TextField
+                            sx={{ mt: 3, mb: 3, height: 55 }}
+                            label="Username"
+                            value={username}
+                            onChange={e => setUsername(e.target.value)}
+                            type="text"
+                            fullWidth
+                            margin='normal'
+                        />
+                    </Grid>
+                    <Grid item md={2} xs={4}>
+                        <Button
+                            variant='contained'
+                            sx={{ mt: 3, mb: 3, height: 55 }}
+                            fullWidth
+                            disabled={username === ""}
+                            onClick={updateBowered}
+                        >
+                            Search
+                        </Button>
+                    </Grid>
+                </Grid>
+            }
             <TableContainer>
                 <Table>
                     <TableHead>
@@ -96,13 +151,24 @@ function Borrow({ mode }: { mode: "user" | "admin" }) {
                                         : "Over due"
                                 }
                                 </TableCell>
-                                {mode === "admin" && <TableCell><Button onClick={() => returnBook(book.isbn)}>Return</Button></TableCell>}
+                                {mode === "admin" && <TableCell>
+                                    <Button
+                                        onClick={() => {
+                                            if (book.fine !== 0) {
+                                                setOpenPayFine(true);
+                                            }
+                                            returnBook(book.isbn, book.bookid);
+                                        }}
+                                    >
+                                        Return
+                                    </Button>
+                                </TableCell>}
                             </TableRow>
                         ))}
                     </TableBody>
                 </Table >
             </TableContainer>
-        </>
+        </Container >
     )
 }
 export default Borrow;

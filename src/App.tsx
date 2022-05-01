@@ -23,13 +23,13 @@ const ModBooks = lazy(() => import('./Pages/ModBooks'));
 const userpages = [
     { name: "Home", to: homepage },
     { name: "Books", to: `${homepage}/books` },
-    { name: "Borrow", to: `${homepage}/borrow` }
+    { name: "Borrowed", to: `${homepage}/borrow` }
 ];
 //管理员的菜单栏
 const adminpages = [
     { name: "Home", to: `${homepage}/admin` },
     { name: "Books", to: `${homepage}/admin/books` },
-    { name: "Borrow", to: `${homepage}/admin/borrow` }
+    { name: "Borrowed", to: `${homepage}/admin/borrow` }
 ]
 function App(): JSX.Element {
     return (

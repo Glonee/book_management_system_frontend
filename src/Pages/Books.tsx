@@ -15,7 +15,7 @@ import {
 import { lazy, Suspense, useEffect, useState } from 'react';
 import Alert from '../Alert';
 import { url } from '../config';
-const Barcode = lazy(() => import('../Barcode'));
+import Barcode from '../Barcode';
 const AddBooks = lazy(() => import('./AddBooks'));
 const BorrowConfirm = lazy(() => import('./BorrowConfirmPage'));
 const ModBooks = lazy(() => import('./ModBooks'));
@@ -118,9 +118,7 @@ function Books({ mode }: { mode: "user" | "admin" }): JSX.Element {
             >
                 <DialogTitle>Barcode</DialogTitle>
                 <DialogContent>
-                    <Suspense fallback={<CircularProgress />}>
-                        <Barcode data={barcode} />
-                    </Suspense>
+                    <Barcode data={barcode} />
                 </DialogContent>
             </Dialog>
             <Dialog
@@ -153,9 +151,7 @@ function Books({ mode }: { mode: "user" | "admin" }): JSX.Element {
                         </Grid>
                         <Grid item xs={4}>
                             {select !== "" &&
-                                <Suspense fallback={<CircularProgress />}>
-                                    <Barcode data={select} />
-                                </Suspense>
+                                <Barcode data={select} />
                             }
                         </Grid>
                     </Grid>

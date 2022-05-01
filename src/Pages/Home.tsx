@@ -1,8 +1,9 @@
 import { Avatar, Container, Box, Typography, Grid, Card, CardContent, CardActions, Button, List, ListItemText } from '@mui/material';
 import { blue } from '@mui/material/colors'
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { url } from '../config';
 import Alert from '../Alert';
+import Barcode from '../Barcode';
 function Home(): JSX.Element {
     const [open, setOpen] = useState(false);
     const [borrowed, setBorrowed] = useState<{
@@ -13,9 +14,8 @@ function Home(): JSX.Element {
         name: string,
         num: number
     }[]>([]);
-    const u = localStorage.getItem("username");
+    const u = useMemo(() => localStorage.getItem("username"), []);
     const username = u === null ? "?" : u;
-    const u1 = username === "" ? "?" : username[0].toUpperCase();
     useEffect(updateBowered, []);
     const overduebooks = borrowed.filter(book => book.fine !== 0).length;
     const num = borrowed.length;
@@ -49,8 +49,7 @@ function Home(): JSX.Element {
                 flexDirection: "column",
                 marginTop: 10
             }}>
-                <Avatar sx={{ bgcolor: blue[400], height: 100, width: 100, mb: 3, fontSize: 70 }}>{u1}</Avatar>
-                <Typography variant='h4' component='p' sx={{ mb: 7 }}>Welcome, {username}</Typography>
+                <Barcode data={username} height={200} width={4} />
                 <Grid container spacing={2} mb={3}>
                     <Grid item xs={12}>
                         <Card>

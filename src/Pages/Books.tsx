@@ -2,7 +2,7 @@ import AddIcon from '@mui/icons-material/Add';
 import {
     AlertColor,
     Button, CircularProgress, Container, Dialog, DialogActions, DialogContent,
-    DialogTitle, FormControl, Grid, InputLabel, List,
+    DialogTitle, FormControl, Grid, InputLabel, Link, List,
     ListItem,
     ListItemText, MenuItem, Select, Table,
     TableBody,
@@ -19,6 +19,7 @@ import Barcode from '../Barcode';
 const AddBooks = lazy(() => import('./AddBooks'));
 const BorrowConfirm = lazy(() => import('./BorrowConfirmPage'));
 const ModBooks = lazy(() => import('./ModBooks'));
+const Reserve = lazy(() => import('./Reserve'));
 const bookprto = {
     name: "",
     author: "",
@@ -48,6 +49,7 @@ function Books({ mode }: { mode: "user" | "admin" }): JSX.Element {
     const [openDetail, setOpenDetail] = useState(false);
     const [openModify, setOpenModify] = useState(false);
     const [openDelete, setOpenDelete] = useState(false);
+    const [openReserve, setOpenReserve] = useState(false);
     const [selectBy, setSelectBy] = useState<keyof book>("name");
     const [searchText, setSearchText] = useState("");
     const [barcode, setBarcode] = useState("");
@@ -115,11 +117,20 @@ function Books({ mode }: { mode: "user" | "admin" }): JSX.Element {
             <Dialog
                 open={barcode !== ""}
                 onClose={() => setBarcode("")}
+                maxWidth="lg"
             >
                 <DialogTitle>Barcode</DialogTitle>
                 <DialogContent>
                     <Barcode data={barcode} />
                 </DialogContent>
+            </Dialog>
+            <Dialog
+                open={openReserve}
+                onClose={() => setOpenReserve(false)}
+            >
+                <Suspense fallback={<DialogContent><CircularProgress /></DialogContent>}>
+                    <Reserve done={() => setOpenReserve(false)} />
+                </Suspense>
             </Dialog>
             <Dialog
                 open={openBorrow}
@@ -278,6 +289,14 @@ function Books({ mode }: { mode: "user" | "admin" }): JSX.Element {
                     </TableBody>
                 </Table >
             </TableContainer>
+            <div style={{ alignItems: 'center', display: 'flex', flexDirection: 'column' }}>
+                <Link
+                    href=''
+                    onClick={e => { e.preventDefault(); setOpenReserve(true) }}
+                >
+                    Can't find the book you want? Reserve it
+                </Link>
+            </div>
         </Container >
     )
 }

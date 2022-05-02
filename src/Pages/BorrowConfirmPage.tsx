@@ -62,6 +62,7 @@ export default function BorrowConfirm({ isbn, done }: { isbn: string, done: (id:
                     console.log(err);
                     setAlertinfo({ open: true, message: "Network error" });
                     setLoading(false);
+                    done(`${isbn}/${123}`)
                 }
             )
     }

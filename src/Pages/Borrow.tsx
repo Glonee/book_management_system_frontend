@@ -1,52 +1,63 @@
-import { TableContainer, Table, TableHead, TableRow, TableCell, TableBody, Button, TextField, Grid, Container, Dialog, DialogTitle, DialogContent, DialogActions, CircularProgress } from '@mui/material';
+import { TableContainer, Table, TableHead, TableRow, TableCell, TableBody, Button, TextField, Grid, Container, Dialog, DialogContent, CircularProgress } from '@mui/material';
 import { lazy, Suspense, useEffect, useState } from 'react';
 import { url } from '../config';
 import Alert from '../Alert';
-import code from '../img/code.jpg'
 const Renew = lazy(() => import('./Renew'));
-export interface borrowitem {
-    bookid: string,
-    borrow_date: string,
-    deadline: string,
-    fine: number,
-    isbn: string,
-    name: string,
-    num: number,
-    username: string,
-}
+const Payfine = lazy(() => import('./Payfine'));
+const itemprto = {
+    bookid: "",
+    borrow_date: "",
+    deadline: "",
+    fine: 0,
+    isbn: "",
+    name: "",
+    username: "",
+    time: ""
+};
+export type borrowitem = typeof itemprto;
 function Borrow({ mode }: { mode: "user" | "admin" }) {
-    const [username, setUsername] = useState("");
-    const [borrowed, setBorrowed] = useState<borrowitem[]>([{
-        bookid: "123",
-        borrow_date: "2022-04-01",
-        deadline: "2022-04-11",
-        fine: 1,
-        isbn: "9787115390592",
-        name: "cpp",
-        num: 1,
-        username: "19040400024"
-    }]);
+    const u = localStorage.getItem(`${mode}name`);
+    const [username, setUsername] = useState(mode === "admin" ? "" : (u === null ? "" : u));
+    const [borrowed, setBorrowed] = useState<borrowitem[]>([]);
     const [alertinfo, setAlertinfo] = useState({ open: false, message: "" });
     const [openPayFine, setOpenPayFine] = useState(false);
     const [openRenew, setOpenRenew] = useState(false);
-    const [selected, setSelected] = useState<borrowitem>();
+    const [selected, setSelected] = useState(itemprto);
     useEffect(() => {
-        fetch(`${url}/user`, {
-            method: 'POST',
-            mode: 'cors',
-            body: JSON.stringify({
-                action: "getBorrowingList",
-                username: localStorage.getItem("username")
+        if (mode === "user") {
+            fetch(`${url}/user`, {
+                method: 'POST',
+                mode: 'cors',
+                body: JSON.stringify({
+                    action: "getBorrowingList",
+                    username: localStorage.getItem("username")
+                })
             })
-        })
-            .then(res => res.json())
-            .then(
-                obj => setBorrowed(obj.map((value: any) => ({ ...value, username: localStorage.getItem("username") }))),
-                err => {
-                    console.log(err);
-                    setAlertinfo({ open: true, message: "Network error" });
-                }
-            );
+                .then(res => res.json())
+                .then(
+                    obj => setBorrowed(obj.map((value: any) => ({ ...value, username: localStorage.getItem("username") }))),
+                    err => {
+                        console.log(err);
+                        setAlertinfo({ open: true, message: "Network error" });
+                    }
+                );
+        } else {
+            fetch(`${url}/admin`, {
+                method: 'POST',
+                mode: 'cors',
+                body: JSON.stringify({
+                    action: "getBorrowingListForAdmin"
+                })
+            })
+                .then(res => res.json())
+                .then(
+                    obj => setBorrowed(obj),
+                    err => {
+                        console.log(err);
+                        setAlertinfo({ open: true, message: "Network error" });
+                    }
+                );
+        }
     }, []);
     const now = new Date();
     const remainings = borrowed.map(value => (new Date(value.deadline).getTime() - now.getTime()));
@@ -68,19 +79,38 @@ function Borrow({ mode }: { mode: "user" | "admin" }) {
                 }
             );
     }
-    function returnBook(isbn: string, bookid: string) {
-        fetch(`${url}/user`, {
+    function getall() {
+        fetch(`${url}/admin`, {
+            method: 'POST',
+            mode: 'cors',
+            body: JSON.stringify({
+                action: "getBorrowingListForAdmin"
+            })
+        })
+            .then(res => res.json())
+            .then(
+                obj => setBorrowed(obj),
+                err => {
+                    console.log(err);
+                    setAlertinfo({ open: true, message: "Network error" });
+                }
+            );
+    }
+    const update = username === "" ? getall : () => updateBowered(username);
+    function returnBook(isbn: string, bookid: string, user: string) {
+        fetch(`${url}/admin`, {
             method: 'POST',
             mode: 'cors',
             body: JSON.stringify({
                 action: "returnBook",
                 isbn: isbn,
-                bookid: bookid
+                bookid: bookid,
+                username: user
             })
         })
             .then(res => res.json())
             .then(
-                () => updateBowered(username),
+                update,
                 err => {
                     console.log(err);
                     setAlertinfo({ open: true, message: "Network error" })
@@ -103,8 +133,11 @@ function Borrow({ mode }: { mode: "user" | "admin" }) {
             >
                 <Suspense fallback={<DialogContent><CircularProgress /></DialogContent>}>
                     <Renew
-                        item={selected as borrowitem}
-                        done={() => { updateBowered(username); setOpenRenew(false); }}
+                        item={selected}
+                        done={() => {
+                            update();
+                            setOpenRenew(false);
+                        }}
                     />
                 </Suspense>
             </Dialog>
@@ -114,13 +147,15 @@ function Borrow({ mode }: { mode: "user" | "admin" }) {
                         open={openPayFine}
                         onClose={() => setOpenPayFine(false)}
                     >
-                        <DialogTitle>Pay fine with Alipay</DialogTitle>
-                        <DialogContent >
-                            <img alt='' src={code} style={{ height: 370, width: 370 }} />
-                        </DialogContent>
-                        <DialogActions>
-                            <Button onClick={() => setOpenPayFine(false)}>Done</Button>
-                        </DialogActions>
+                        <Suspense fallback={<DialogContent><CircularProgress /></DialogContent>}>
+                            <Payfine
+                                fine={selected.fine}
+                                done={() => {
+                                    returnBook(selected.isbn, selected.bookid, selected.username);
+                                    setOpenPayFine(false);
+                                }}
+                            />
+                        </Suspense>
                     </Dialog>
                     <Grid item md={10} xs={8}>
                         <TextField
@@ -138,8 +173,7 @@ function Borrow({ mode }: { mode: "user" | "admin" }) {
                             variant='contained'
                             sx={{ mt: 3, mb: 3, height: 55 }}
                             fullWidth
-                            disabled={username === ""}
-                            onClick={() => updateBowered(username)}
+                            onClick={update}
                         >
                             Search
                         </Button>
@@ -154,8 +188,8 @@ function Borrow({ mode }: { mode: "user" | "admin" }) {
                             <TableCell>ISBN</TableCell>
                             <TableCell>Borrow date</TableCell>
                             <TableCell>Deadline</TableCell>
+                            {mode === "admin" && <TableCell>Username</TableCell>}
                             <TableCell align='right'>Fine</TableCell>
-                            <TableCell align='right'>Num</TableCell>
                             <TableCell align="right">Remaining days</TableCell>
                             <TableCell align="right">Renew</TableCell>
                             {mode === "admin" && <TableCell>Return</TableCell>}
@@ -171,8 +205,8 @@ function Borrow({ mode }: { mode: "user" | "admin" }) {
                                 <TableCell>{book.isbn}</TableCell>
                                 <TableCell>{book.borrow_date}</TableCell>
                                 <TableCell>{book.deadline}</TableCell>
+                                {mode === "admin" && <TableCell>{book.username}</TableCell>}
                                 <TableCell align='right'>{book.fine}</TableCell>
-                                <TableCell align='right'>{book.num}</TableCell>
                                 <TableCell align="right">{
                                     remainings[index] > 0 ?
                                         (remainings[index] / 1000 / 60 / 60 / 24).toFixed(0)
@@ -193,9 +227,12 @@ function Borrow({ mode }: { mode: "user" | "admin" }) {
                                     <Button
                                         onClick={() => {
                                             if (book.fine !== 0) {
+                                                setSelected(book);
                                                 setOpenPayFine(true);
+                                                window.open(`${url}/index1.jsp?bookid=${book.bookid}&isbn=\"${book.isbn}\"&payFine=${book.fine}&name=\"${book.name}\"`);
+                                            } else {
+                                                returnBook(book.isbn, book.bookid, book.username)
                                             }
-                                            returnBook(book.isbn, book.bookid);
                                         }}
                                     >
                                         Return

@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { url } from "../config";
 import { book as typeofbook } from "./Books";
 import Alert from "../Alert";
-export default function BorrowConfirm({ isbn, done }: { isbn: string, done: (id: string) => void }) {
+export default function BorrowConfirm({ isbn, user, done }: { isbn: string, user: string, done: (id: string) => void }) {
     const [alertinfo, setAlertinfo] = useState({ open: false, message: "" });
     const [loading, setLoading] = useState(false);
     const [book, setBook] = useState<typeofbook>();
@@ -42,7 +42,7 @@ export default function BorrowConfirm({ isbn, done }: { isbn: string, done: (id:
             mode: 'cors',
             body: JSON.stringify({
                 action: "borrow",
-                username: localStorage.getItem("username"),
+                username: user,
                 isbn: isbn,
                 num: 1
             })
@@ -51,18 +51,16 @@ export default function BorrowConfirm({ isbn, done }: { isbn: string, done: (id:
             .then(
                 obj => {
                     if (obj.state === 0) {
-                        done(isbn);
+                        done(`${isbn}/${obj.bookid}`);
                     } else {
-                        setAlertinfo({ open: true, message: "Fail" });
+                        setAlertinfo({ open: true, message: "Can't borrow more book" });
                     }
                     setLoading(false);
-                    done(isbn);
                 },
                 err => {
                     console.log(err);
                     setAlertinfo({ open: true, message: "Network error" });
                     setLoading(false);
-                    done(`${isbn}/${123}`)
                 }
             )
     }

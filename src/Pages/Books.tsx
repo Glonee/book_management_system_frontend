@@ -12,14 +12,13 @@ import {
     TableRow,
     TextField
 } from '@mui/material';
-import { lazy, Suspense, useEffect, useState } from 'react';
+import { lazy, Suspense, useEffect, useMemo, useState } from 'react';
 import Alert from '../Alert';
 import { url } from '../config';
 import Barcode from '../Barcode';
 const AddBooks = lazy(() => import('./AddBooks'));
 const BorrowConfirm = lazy(() => import('./BorrowConfirmPage'));
 const ModBooks = lazy(() => import('./ModBooks'));
-const Reserve = lazy(() => import('./Reserve'));
 const bookprto = {
     name: "",
     author: "",
@@ -49,7 +48,6 @@ function Books({ mode }: { mode: "user" | "admin" }): JSX.Element {
     const [openDetail, setOpenDetail] = useState(false);
     const [openModify, setOpenModify] = useState(false);
     const [openDelete, setOpenDelete] = useState(false);
-    const [openReserve, setOpenReserve] = useState(false);
     const [selectBy, setSelectBy] = useState<keyof book>("name");
     const [searchText, setSearchText] = useState("");
     const [barcode, setBarcode] = useState("");
@@ -60,6 +58,8 @@ function Books({ mode }: { mode: "user" | "admin" }): JSX.Element {
     }>({ open: false, message: "", serivity: 'error' });
     const [loading, setLoading] = useState(false);
     const [select, setSelect] = useState("");
+    const u = useMemo(() => localStorage.getItem(`${mode}name`), []);
+    const username = u === null ? "" : u;
     const selectedbook = books.find(value => value.isbn === select);
     const keys = Object.keys(bookprto) as (keyof book)[];
     useEffect(updateBooks, []);
@@ -82,7 +82,7 @@ function Books({ mode }: { mode: "user" | "admin" }): JSX.Element {
     }
     function deleteBook(isbn: string) {
         setLoading(true);
-        fetch(`${url}/book`, {
+        fetch(`${url}/admin`, {
             method: 'POST',
             mode: 'cors',
             body: JSON.stringify({ action: "deleteBook", isbn: isbn })
@@ -125,19 +125,11 @@ function Books({ mode }: { mode: "user" | "admin" }): JSX.Element {
                 </DialogContent>
             </Dialog>
             <Dialog
-                open={openReserve}
-                onClose={() => setOpenReserve(false)}
-            >
-                <Suspense fallback={<DialogContent><CircularProgress /></DialogContent>}>
-                    <Reserve done={() => setOpenReserve(false)} />
-                </Suspense>
-            </Dialog>
-            <Dialog
                 open={openBorrow}
                 onClose={() => setOpenBorrow(false)}
             >
                 <Suspense fallback={<DialogContent><CircularProgress /></DialogContent>}>
-                    <BorrowConfirm isbn={select} done={id => { setBarcode(id); updateBooks(); setOpenBorrow(false); }} />
+                    <BorrowConfirm isbn={select} user={username} done={id => { setBarcode(id); updateBooks(); setOpenBorrow(false); }} />
                 </Suspense>
             </Dialog>
             <Dialog
@@ -148,24 +140,15 @@ function Books({ mode }: { mode: "user" | "admin" }): JSX.Element {
             >
                 <DialogTitle>Detail</DialogTitle>
                 <DialogContent>
-                    <Grid container>
-                        <Grid item xs={8}>
-                            <List>
-                                {selectedbook !== undefined && keys.map(key => (
-                                    <ListItem>
-                                        <ListItemText key={key}>
-                                            {key}: {selectedbook[key]}
-                                        </ListItemText>
-                                    </ListItem>
-                                ))}
-                            </List>
-                        </Grid>
-                        <Grid item xs={4}>
-                            {select !== "" &&
-                                <Barcode data={select} />
-                            }
-                        </Grid>
-                    </Grid>
+                    <List>
+                        {selectedbook !== undefined && keys.map(key => (
+                            <ListItem>
+                                <ListItemText key={key}>
+                                    {key}: {selectedbook[key]}
+                                </ListItemText>
+                            </ListItem>
+                        ))}
+                    </List>
                 </DialogContent>
                 <DialogActions>
                     {mode === "admin" &&
@@ -184,7 +167,7 @@ function Books({ mode }: { mode: "user" | "admin" }): JSX.Element {
                         onClose={() => setOpenAddBooks(false)}
                     >
                         <Suspense fallback={<DialogContent><CircularProgress /></DialogContent>}>
-                            <AddBooks done={id => { setBarcode(id); updateBooks(); setOpenAddBooks(false); }} />
+                            <AddBooks done={id => { updateBooks(); setOpenAddBooks(false); }} />
                         </Suspense>
                     </Dialog>
                     <Dialog
@@ -194,7 +177,7 @@ function Books({ mode }: { mode: "user" | "admin" }): JSX.Element {
                         <Suspense fallback={<DialogContent><CircularProgress /></DialogContent>}>
                             <ModBooks
                                 book={selectedbook as book}
-                                done={() => { updateBooks(); setOpenBorrow(false) }} />
+                                done={() => { updateBooks(); setOpenModify(false) }} />
                         </Suspense>
                     </Dialog>
                     <Dialog
@@ -289,14 +272,6 @@ function Books({ mode }: { mode: "user" | "admin" }): JSX.Element {
                     </TableBody>
                 </Table >
             </TableContainer>
-            <div style={{ alignItems: 'center', display: 'flex', flexDirection: 'column' }}>
-                <Link
-                    href=''
-                    onClick={e => { e.preventDefault(); setOpenReserve(true) }}
-                >
-                    Can't find the book you want? Reserve it
-                </Link>
-            </div>
         </Container >
     )
 }

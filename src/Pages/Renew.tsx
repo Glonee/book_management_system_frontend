@@ -7,7 +7,7 @@ export default function Renew({ item, done }: { item: borrowitem, done: () => vo
     const [days, setDays] = useState("");
     const [open, setOpen] = useState(false);
     function RenewBook() {
-        fetch(`${url}/book`, {
+        fetch(`${url}/user`, {
             mode: "cors",
             method: "POST",
             body: JSON.stringify({

@@ -46,7 +46,7 @@ function ModBooks({ book, done }: { book: booktype, done: () => void }) {
     }
     function handleSubbmit() {
         setLoading(true);
-        fetch(`${url}/book`, {
+        fetch(`${url}/admin`, {
             method: 'POST',
             mode: 'cors',
             body: JSON.stringify({
@@ -54,7 +54,7 @@ function ModBooks({ book, done }: { book: booktype, done: () => void }) {
                 action: "updateBook",
                 price: +info.price,
                 num: +info.num,
-                publish_date: (info.publish_date as Date).toUTCString().split('T')[0]
+                publish_date: (info.publish_date as Date).toISOString().split('T')[0]
             })
         })
             .then(res => res.json())

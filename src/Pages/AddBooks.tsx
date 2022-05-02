@@ -45,7 +45,7 @@ function AddBooks({ done }: { done: (id: string) => void }) {
     }
     function handleSubbmit() {
         setLoading(true);
-        fetch(`${url}/book`, {
+        fetch(`${url}/admin`, {
             method: 'POST',
             mode: 'cors',
             body: JSON.stringify({

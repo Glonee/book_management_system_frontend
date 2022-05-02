@@ -41,7 +41,7 @@ function App(): JSX.Element {
                     <Route path={homepage}>
                         <Route element={<Base pages={userpages} mode="user" />} >
                             {/*用户可用的页面*/}
-                            <Route index element={<Sus><Home /></Sus>} />
+                            <Route index element={<Sus><Home mode="user" /></Sus>} />
                             <Route path="books" element={<Sus><Books mode="user" /></Sus>} />
                             <Route path="borrow" element={<Sus><Borrow mode="user" /></Sus>} />
                         </Route>
@@ -50,7 +50,7 @@ function App(): JSX.Element {
                         <Route path="admin" >
                             <Route element={<Base pages={adminpages} mode="admin" />}>
                                 {/*管理员可用的页面*/}
-                                <Route index element={<Sus><Home /></Sus>} />
+                                <Route index element={<Sus><Home mode="admin" /></Sus>} />
                                 <Route path="books" element={<Sus><Books mode="admin" /></Sus>} />
                                 <Route path="borrow" element={<Sus><Borrow mode="admin" /></Sus>} />
                             </Route>

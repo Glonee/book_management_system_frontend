@@ -1,10 +1,9 @@
-import { Avatar, Container, Box, Typography, Grid, Card, CardContent, CardActions, Button, List, ListItemText } from '@mui/material';
-import { blue } from '@mui/material/colors'
+import { Container, Box, Typography, Grid, Card, CardContent, CardActions, Button, List, ListItemText } from '@mui/material';
 import { useEffect, useMemo, useState } from 'react';
 import { url } from '../config';
 import Alert from '../Alert';
 import Barcode from '../Barcode';
-function Home(): JSX.Element {
+function Home({ mode }: { mode: "user" | "admin" }): JSX.Element {
     const [open, setOpen] = useState(false);
     const [borrowed, setBorrowed] = useState<{
         borrow_date: string,
@@ -14,27 +13,28 @@ function Home(): JSX.Element {
         name: string,
         num: number
     }[]>([]);
-    const u = useMemo(() => localStorage.getItem("username"), []);
+    const u = useMemo(() => localStorage.getItem(`${mode}name`), []);
     const username = u === null ? "?" : u;
-    useEffect(updateBowered, []);
+    useEffect(() => {
+        if (mode === "user") {
+            fetch(`${url}/user`, {
+                method: 'POST',
+                mode: 'cors',
+                body: JSON.stringify({
+                    action: "getBorrowingList",
+                    username: localStorage.getItem(`${mode}name`)
+                })
+            })
+                .then(res => res.json())
+                .then(
+                    obj => { if (obj !== undefined) { setBorrowed(obj) } },
+                    err => { console.log(err); setOpen(true); }
+                );
+        }
+    }, []);
     const overduebooks = borrowed.filter(book => book.fine !== 0).length;
     const num = borrowed.length;
     const messages = [`You have ${overduebooks} over due book!`];
-    function updateBowered() {
-        fetch(`${url}/user`, {
-            method: 'POST',
-            mode: 'cors',
-            body: JSON.stringify({
-                action: "getBorrowingList",
-                username: localStorage.getItem("username")
-            })
-        })
-            .then(res => res.json())
-            .then(
-                obj => { if (obj !== undefined) { setBorrowed(obj) } },
-                err => { console.log(err); setOpen(true); }
-            );
-    }
     return (
         <Container maxWidth="md" component="main">
             <Alert

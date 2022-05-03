@@ -33,17 +33,7 @@ const bookprto = {
 };
 export type book = typeof bookprto;
 function Books({ mode }: { mode: "user" | "admin" }): JSX.Element {
-    const [books, setBooks] = useState<book[]>([{
-        "author": "author0",
-        bclass: "文学类",
-        isbn: "11111111",
-        name: "bookname0",
-        num: 59,
-        position: "101-05-01",
-        price: 20,
-        publish: "商务印书馆",
-        publish_date: "2001-01-01"
-    }]);
+    const [books, setBooks] = useState<book[]>([]);
     const [openBorrow, setOpenBorrow] = useState(false);
     const [openAddBooks, setOpenAddBooks] = useState(false);
     const [openDetail, setOpenDetail] = useState(false);

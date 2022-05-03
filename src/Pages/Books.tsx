@@ -51,7 +51,7 @@ function Books({ mode }: { mode: "user" | "admin" }): JSX.Element {
     const [openDelete, setOpenDelete] = useState(false);
     const [selectBy, setSelectBy] = useState<keyof book>("name");
     const [searchText, setSearchText] = useState("");
-    const [barcode, setBarcode] = useState("");
+    const [barcodes, setBarcodes] = useState<string[]>([]);
     const [alertinfo, setAlertinfo] = useState<{
         open: boolean,
         message: string,
@@ -59,6 +59,7 @@ function Books({ mode }: { mode: "user" | "admin" }): JSX.Element {
     }>({ open: false, message: "", serivity: 'error' });
     const [loading, setLoading] = useState(false);
     const [select, setSelect] = useState("");
+    const [bookid, setBookid] = useState("");
     const u = useMemo(() => localStorage.getItem(`${mode}name`), [mode]);
     const username = u === null ? "" : u;
     const selectedbook = books.find(value => value.isbn === select);
@@ -74,7 +75,7 @@ function Books({ mode }: { mode: "user" | "admin" }): JSX.Element {
             .then(res => res.json())
             .then(
                 obj => { setBooks(obj); setLoading(false); },
-                err => {
+                () => {
                     setAlertinfo({ open: true, message: "Network error", serivity: "error" });
                     setLoading(false);
                 }
@@ -89,13 +90,15 @@ function Books({ mode }: { mode: "user" | "admin" }): JSX.Element {
                 servrity={alertinfo.serivity}
             />
             <Dialog
-                open={barcode !== ""}
-                onClose={() => setBarcode("")}
+                open={barcodes.length !== 0}
+                onClose={() => setBarcodes([])}
                 maxWidth="lg"
             >
-                <DialogTitle>Barcode</DialogTitle>
-                <DialogContent>
-                    <Barcode data={barcode} />
+                <DialogTitle>Barcodes</DialogTitle>
+                <DialogContent sx={{ display: 'flex', flexDirection: 'column' }}>
+                    {barcodes.map(barcode => (
+                        <Barcode key={barcode} data={barcode} />
+                    ))}
                 </DialogContent>
             </Dialog>
             <Dialog
@@ -103,26 +106,48 @@ function Books({ mode }: { mode: "user" | "admin" }): JSX.Element {
                 onClose={() => setOpenBorrow(false)}
             >
                 <Suspense fallback={<DialogContent><CircularProgress /></DialogContent>}>
-                    <BorrowConfirm isbn={select} user={username} done={id => { setBarcode(id); updateBooks(); setOpenBorrow(false); }} />
+                    <BorrowConfirm isbn={select} user={username} done={id => { setBarcodes([id]); updateBooks(); setOpenBorrow(false); }} />
                 </Suspense>
             </Dialog>
             <Dialog
                 open={openDetail}
-                onClose={() => setOpenDetail(false)}
-                maxWidth="sm"
+                onClose={() => { setOpenDetail(false); setBookid(""); }}
+                maxWidth="md"
                 fullWidth
             >
                 <DialogTitle>Detail</DialogTitle>
                 <DialogContent>
-                    <List>
-                        {selectedbook !== undefined && keys.map(key => (
-                            <ListItem>
-                                <ListItemText key={key}>
-                                    {key}: {selectedbook[key]}
-                                </ListItemText>
-                            </ListItem>
-                        ))}
-                    </List>
+                    <Grid container>
+                        <Grid item xs={4}>
+                            <List>
+                                {selectedbook !== undefined && keys.map(key => (
+                                    <ListItem>
+                                        <ListItemText key={key}>
+                                            {key}: {selectedbook[key]}
+                                        </ListItemText>
+                                    </ListItem>
+                                ))}
+                            </List>
+                        </Grid>
+                        <Grid item xs={8} sx={{display:'flex', flexDirection: 'column'}}>
+                            <FormControl margin='normal'>
+                                <InputLabel id="labelid">Bookid</InputLabel>
+                                <Select
+                                    labelId="labelid"
+                                    label="Bookid"
+                                    value={bookid}
+                                    onChange={e => setBookid(e.target.value)}
+                                >
+                                    {selectedbook !== undefined &&
+                                        Array.from(Array(+selectedbook.num).keys()).map((_, index) => (
+                                            <MenuItem key={index} value={index.toString()}>{index}</MenuItem>
+                                        ))
+                                    }
+                                </Select>
+                            </FormControl>
+                            {bookid !== "" && selectedbook !== undefined && <Barcode data={`${selectedbook.isbn}/${bookid}/${selectedbook.position}`} />}
+                        </Grid>
+                    </Grid>
                 </DialogContent>
                 <DialogActions>
                     {mode === "admin" &&
@@ -141,7 +166,7 @@ function Books({ mode }: { mode: "user" | "admin" }): JSX.Element {
                         onClose={() => setOpenAddBooks(false)}
                     >
                         <Suspense fallback={<DialogContent><CircularProgress /></DialogContent>}>
-                            <AddBooks done={id => { updateBooks(); setBarcode(id); setOpenAddBooks(false); }} />
+                            <AddBooks done={ids => { updateBooks(); setBarcodes(ids); setOpenAddBooks(false); }} />
                         </Suspense>
                     </Dialog>
                     <Dialog

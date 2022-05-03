@@ -4,7 +4,7 @@ import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { useState } from "react";
 import { apikey, isbnapi, url } from '../config';
 import Alert from "./Alert";
-function AddBooks({ done }: { done: (id: string) => void }) {
+function AddBooks({ done }: { done: (code: string[]) => void }) {
     const [info, setInfo] = useState<{
         name: string;
         author: string;
@@ -62,15 +62,13 @@ function AddBooks({ done }: { done: (id: string) => void }) {
                     if (obj.state !== 1) {
                         setAlertinfo({ open: true, message: "Add book error" });
                     } else {
-                        done(info.isbn);
-                        setLoading(false);
+                        done(Array.from(Array(+info.num).keys()).map((_, index) => `${info.isbn}/${index}/${info.position}`));
                     }
-
+                    setLoading(false);
                 },
-                err => {
+                () => {
                     setAlertinfo({ open: true, message: "Network error" });
                     setLoading(false);
-                    //done(info.isbn);
                 })
     }
     function getbookinfo() {
@@ -101,7 +99,7 @@ function AddBooks({ done }: { done: (id: string) => void }) {
                     }
                     setFetching(false);
                 },
-                err => {
+                () => {
                     setAlertinfo({ open: true, message: "Network error" });
                     setFetching(false);
                 }

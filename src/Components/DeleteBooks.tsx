@@ -23,7 +23,7 @@ export default function DeleteBooks({ book, done }: { book: booktype, done: () =
                     }
                     setLoading(false);
                 },
-                err => {
+                () => {
                     setAlertinfo({ open: true, message: "Network error" });
                     setLoading(false);
                 }

@@ -27,5 +27,8 @@ img/
 *.jpg
 *.png
 
-# Debug files
+# Develop & Debug files
 /.vscode
+*.exe
+server
+config.json

@@ -20,23 +20,26 @@ function Signin({ mode }: { mode: "user" | "admin" }): JSX.Element {
                 body: JSON.stringify({ action: "login", username: user, password: pwd })
             })
                 .then(res => res.json())
-                .then(obj => {
-                    if (obj.state === 1) {
-                        localStorage.setItem(`${mode}token`, "123");
-                        localStorage.setItem(`${mode}name`, user);
-                        if (mode === "user") {
-                            navigate(homepage, { replace: true });
+                .then(
+                    obj => {
+                        if (obj.state === 1) {
+                            localStorage.setItem(`${mode}token`, "123");
+                            localStorage.setItem(`${mode}name`, user);
+                            if (mode === "user") {
+                                navigate(homepage, { replace: true });
+                            } else {
+                                navigate(homepage === "/" ? "/admin" : `${homepage}/admin`, { replace: true });
+                            }
                         } else {
-                            navigate(homepage === "/" ? "/admin" : `${homepage}/admin`, { replace: true });
+                            setAlert({ open: true, message: "Wrong username or password" })
+                            setLoading(false);
                         }
-                    } else {
-                        setAlert({ open: true, message: "Wrong username or password" })
+                    },
+                    () => {
+                        setAlert({ open: true, message: "Can not contact server" })
                         setLoading(false);
                     }
-                }).catch(err => {
-                    setAlert({ open: true, message: "Can not contact server" })
-                    setLoading(false);
-                });
+                )
         }
     }
     return (

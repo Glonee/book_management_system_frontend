@@ -77,7 +77,7 @@ function ModBooks({ book, done }: { book: booktype, done: () => void }) {
                     }
                     setLoading(false);
                 },
-                err => {
+                () => {
                     setAlertinfo({ open: true, message: "Network error", servrity: "error" });
                     setLoading(false);
                 }

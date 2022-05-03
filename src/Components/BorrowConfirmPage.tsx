@@ -28,7 +28,7 @@ export default function BorrowConfirm({ isbn, user, done }: { isbn: string, user
                     }
                     setLoading(false);
                 },
-                err => {
+                () => {
                     setAlertinfo({ open: true, message: "Network error" });
                     setLoading(false);
                 }
@@ -56,7 +56,7 @@ export default function BorrowConfirm({ isbn, user, done }: { isbn: string, user
                     }
                     setLoading(false);
                 },
-                err => {
+                () => {
                     setAlertinfo({ open: true, message: "Network error" });
                     setLoading(false);
                 }
@@ -70,7 +70,7 @@ export default function BorrowConfirm({ isbn, user, done }: { isbn: string, user
                 servrity="error"
                 message={alertinfo.message}
             />
-            <DialogTitle>Confirm your borrowing</DialogTitle>
+            <DialogTitle>Confirm your borrow</DialogTitle>
             <DialogContent>
                 <Typography>Name: {book === undefined ? "" : book.name}</Typography>
                 <Typography>ISBN: {isbn}</Typography>

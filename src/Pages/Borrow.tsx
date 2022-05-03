@@ -1,9 +1,9 @@
-import { TableContainer, Table, TableHead, TableRow, TableCell, TableBody, Button, TextField, Grid, Container, Dialog, DialogContent, CircularProgress } from '@mui/material';
+import { Button, CircularProgress, Container, Dialog, DialogContent, Grid, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField } from '@mui/material';
 import { lazy, Suspense, useEffect, useState } from 'react';
+import Alert from '../Components/Alert';
 import { url } from '../config';
-import Alert from '../Alert';
-const Renew = lazy(() => import('./Renew'));
-const Payfine = lazy(() => import('./Payfine'));
+const Renew = lazy(() => import('../Components/Renew'));
+const Payfine = lazy(() => import('../Components/Payfine'));
 const itemprto = {
     bookid: "",
     borrow_date: "",
@@ -36,10 +36,7 @@ function Borrow({ mode }: { mode: "user" | "admin" }) {
                 .then(res => res.json())
                 .then(
                     obj => setBorrowed(obj.map((value: any) => ({ ...value, username: localStorage.getItem("username") }))),
-                    err => {
-                        console.log(err);
-                        setAlertinfo({ open: true, message: "Network error" });
-                    }
+                    () => setAlertinfo({ open: true, message: "Network error" })
                 );
         } else {
             fetch(`${url}/admin`, {
@@ -52,13 +49,10 @@ function Borrow({ mode }: { mode: "user" | "admin" }) {
                 .then(res => res.json())
                 .then(
                     obj => setBorrowed(obj),
-                    err => {
-                        console.log(err);
-                        setAlertinfo({ open: true, message: "Network error" });
-                    }
+                    () => setAlertinfo({ open: true, message: "Network error" })
                 );
         }
-    }, []);
+    }, [mode]);
     const now = new Date();
     const remainings = borrowed.map(value => (new Date(value.deadline).getTime() - now.getTime()));
     function updateBowered(user: string) {
@@ -73,10 +67,7 @@ function Borrow({ mode }: { mode: "user" | "admin" }) {
             .then(res => res.json())
             .then(
                 obj => setBorrowed(obj.map((value: any) => ({ ...value, username: user }))),
-                err => {
-                    console.log(err);
-                    setAlertinfo({ open: true, message: "Network error" });
-                }
+                () => setAlertinfo({ open: true, message: "Network error" })
             );
     }
     function getall() {
@@ -90,10 +81,7 @@ function Borrow({ mode }: { mode: "user" | "admin" }) {
             .then(res => res.json())
             .then(
                 obj => setBorrowed(obj),
-                err => {
-                    console.log(err);
-                    setAlertinfo({ open: true, message: "Network error" });
-                }
+                () => setAlertinfo({ open: true, message: "Network error" })
             );
     }
     const update = username === "" ? getall : () => updateBowered(username);
@@ -111,10 +99,7 @@ function Borrow({ mode }: { mode: "user" | "admin" }) {
             .then(res => res.json())
             .then(
                 update,
-                err => {
-                    console.log(err);
-                    setAlertinfo({ open: true, message: "Network error" })
-                }
+                () => setAlertinfo({ open: true, message: "Network error" })
             )
     }
     return (
@@ -149,7 +134,6 @@ function Borrow({ mode }: { mode: "user" | "admin" }) {
                     >
                         <Suspense fallback={<DialogContent><CircularProgress /></DialogContent>}>
                             <Payfine
-                                fine={selected.fine}
                                 done={() => {
                                     returnBook(selected.isbn, selected.bookid, selected.username);
                                     setOpenPayFine(false);
@@ -229,7 +213,7 @@ function Borrow({ mode }: { mode: "user" | "admin" }) {
                                             if (book.fine !== 0) {
                                                 setSelected(book);
                                                 setOpenPayFine(true);
-                                                window.open(`${url}/index1.jsp?bookid=${book.bookid}&isbn=\"${book.isbn}\"&payFine=${book.fine}&name=\"${book.name}\"`);
+                                                window.open(`${url}/index1.jsp?bookid=${book.bookid}&isbn="${book.isbn}"&payFine=${book.fine}&name="${book.name}"`);
                                             } else {
                                                 returnBook(book.isbn, book.bookid, book.username)
                                             }

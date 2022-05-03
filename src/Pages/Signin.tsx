@@ -3,8 +3,8 @@ import { Avatar, Box, Button, Container, Link, TextField, Typography } from "@mu
 import { blue } from "@mui/material/colors";
 import { useState } from "react";
 import { Link as RouterLink, useNavigate } from "react-router-dom";
-import { homepage, url } from './config';
-import Alert from "./Alert";
+import Alert from "../Components/Alert";
+import { homepage, url } from '../config';
 function Signin({ mode }: { mode: "user" | "admin" }): JSX.Element {
     const [user, setUser] = useState("");
     const [pwd, setPwd] = useState("");
@@ -34,7 +34,6 @@ function Signin({ mode }: { mode: "user" | "admin" }): JSX.Element {
                         setLoading(false);
                     }
                 }).catch(err => {
-                    console.log(err);
                     setAlert({ open: true, message: "Can not contact server" })
                     setLoading(false);
                 });

@@ -1,6 +1,6 @@
 //条形码组件
-import { useEffect, useRef } from "react";
 import JsBarcode from "jsbarcode";
+import { useEffect, useRef } from "react";
 export default function Barcode({ data, height = 100, width = 2 }: { data: string, height?: number, width?: number }) {
     const svgref = useRef<SVGSVGElement>(null);
     useEffect(() => {

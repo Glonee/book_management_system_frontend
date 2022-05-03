@@ -2,7 +2,7 @@ import AddIcon from '@mui/icons-material/Add';
 import {
     AlertColor,
     Button, CircularProgress, Container, Dialog, DialogActions, DialogContent,
-    DialogTitle, FormControl, Grid, InputLabel, Link, List,
+    DialogTitle, FormControl, Grid, InputLabel, List,
     ListItem,
     ListItemText, MenuItem, Select, Table,
     TableBody,
@@ -13,12 +13,13 @@ import {
     TextField
 } from '@mui/material';
 import { lazy, Suspense, useEffect, useMemo, useState } from 'react';
-import Alert from '../Alert';
+import Alert from '../Components/Alert';
+import Barcode from '../Components/Barcode';
 import { url } from '../config';
-import Barcode from '../Barcode';
-const AddBooks = lazy(() => import('./AddBooks'));
-const BorrowConfirm = lazy(() => import('./BorrowConfirmPage'));
-const ModBooks = lazy(() => import('./ModBooks'));
+const AddBooks = lazy(() => import('../Components/AddBooks'));
+const BorrowConfirm = lazy(() => import('../Components/BorrowConfirmPage'));
+const ModBooks = lazy(() => import('../Components/ModBooks'));
+const DeleteBooks = lazy(() => import('../Components/DeleteBooks'));
 const bookprto = {
     name: "",
     author: "",
@@ -58,7 +59,7 @@ function Books({ mode }: { mode: "user" | "admin" }): JSX.Element {
     }>({ open: false, message: "", serivity: 'error' });
     const [loading, setLoading] = useState(false);
     const [select, setSelect] = useState("");
-    const u = useMemo(() => localStorage.getItem(`${mode}name`), []);
+    const u = useMemo(() => localStorage.getItem(`${mode}name`), [mode]);
     const username = u === null ? "" : u;
     const selectedbook = books.find(value => value.isbn === select);
     const keys = Object.keys(bookprto) as (keyof book)[];
@@ -74,33 +75,6 @@ function Books({ mode }: { mode: "user" | "admin" }): JSX.Element {
             .then(
                 obj => { setBooks(obj); setLoading(false); },
                 err => {
-                    console.log(err);
-                    setAlertinfo({ open: true, message: "Network error", serivity: "error" });
-                    setLoading(false);
-                }
-            )
-    }
-    function deleteBook(isbn: string) {
-        setLoading(true);
-        fetch(`${url}/admin`, {
-            method: 'POST',
-            mode: 'cors',
-            body: JSON.stringify({ action: "deleteBook", isbn: isbn })
-        })
-            .then(res => res.json())
-            .then(
-                obj => {
-                    if (obj.state === 1) {
-                        setAlertinfo({ open: true, message: "Success", serivity: 'success' });
-                        updateBooks();
-                        setOpenDelete(false);
-                    } else {
-                        setAlertinfo({ open: true, message: "Fail", serivity: "error" });
-                    }
-                    setLoading(false);
-                },
-                err => {
-                    console.log(err);
                     setAlertinfo({ open: true, message: "Network error", serivity: "error" });
                     setLoading(false);
                 }
@@ -167,7 +141,7 @@ function Books({ mode }: { mode: "user" | "admin" }): JSX.Element {
                         onClose={() => setOpenAddBooks(false)}
                     >
                         <Suspense fallback={<DialogContent><CircularProgress /></DialogContent>}>
-                            <AddBooks done={id => { updateBooks(); setOpenAddBooks(false); }} />
+                            <AddBooks done={id => { updateBooks(); setBarcode(id); setOpenAddBooks(false); }} />
                         </Suspense>
                     </Dialog>
                     <Dialog
@@ -183,20 +157,15 @@ function Books({ mode }: { mode: "user" | "admin" }): JSX.Element {
                     <Dialog
                         open={openDelete}
                         onClose={() => setOpenDelete(false)}
-                        maxWidth="sm"
+                        maxWidth="xs"
                         fullWidth
                     >
-                        <DialogTitle>Delete book</DialogTitle>
-                        <DialogContent>Delete {selectedbook !== undefined && selectedbook.name}?</DialogContent>
-                        <DialogActions>
-                            <Button
-                                color='error'
-                                variant='contained'
-                                onClick={() => deleteBook(select)}
-                            >
-                                Confirm
-                            </Button>
-                        </DialogActions>
+                        <Suspense fallback={<DialogContent><CircularProgress /></DialogContent>}>
+                            <DeleteBooks
+                                book={selectedbook as book}
+                                done={() => { updateBooks(); setOpenDelete(false); }}
+                            />
+                        </Suspense>
                     </Dialog>
                     <Button
                         disabled={loading}

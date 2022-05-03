@@ -1,8 +1,8 @@
-import { Container, Box, Typography, Grid, Card, CardContent, CardActions, Button, List, ListItemText } from '@mui/material';
+import { Box, Button, Card, CardActions, CardContent, Container, Grid, List, ListItemText, Typography } from '@mui/material';
 import { useEffect, useMemo, useState } from 'react';
+import Alert from '../Components/Alert';
+import Barcode from '../Components/Barcode';
 import { url } from '../config';
-import Alert from '../Alert';
-import Barcode from '../Barcode';
 function Home({ mode }: { mode: "user" | "admin" }): JSX.Element {
     const [open, setOpen] = useState(false);
     const [borrowed, setBorrowed] = useState<{
@@ -13,7 +13,7 @@ function Home({ mode }: { mode: "user" | "admin" }): JSX.Element {
         name: string,
         num: number
     }[]>([]);
-    const u = useMemo(() => localStorage.getItem(`${mode}name`), []);
+    const u = useMemo(() => localStorage.getItem(`${mode}name`), [mode]);
     const username = u === null ? "?" : u;
     useEffect(() => {
         if (mode === "user") {
@@ -28,10 +28,10 @@ function Home({ mode }: { mode: "user" | "admin" }): JSX.Element {
                 .then(res => res.json())
                 .then(
                     obj => { if (obj !== undefined) { setBorrowed(obj) } },
-                    err => { console.log(err); setOpen(true); }
+                    () => setOpen(true)
                 );
         }
-    }, []);
+    }, [mode]);
     const overduebooks = borrowed.filter(book => book.fine !== 0).length;
     const num = borrowed.length;
     const messages = [`You have ${overduebooks} over due book!`];

@@ -1,4 +1,4 @@
-import { Snackbar, Alert as MuiAlert, AlertColor } from "@mui/material";
+import { Alert as MuiAlert, AlertColor, Snackbar } from "@mui/material";
 export default function Alert({ open, onClose, message, servrity }: { open: boolean, onClose: () => void, message: string, servrity: AlertColor }) {
     return (
         <Snackbar

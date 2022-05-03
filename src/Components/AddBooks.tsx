@@ -1,9 +1,9 @@
-import { AlertColor, Box, Button, DialogActions, DialogContent, DialogTitle, Grid, TextField } from "@mui/material";
+import { Box, Button, DialogActions, DialogContent, DialogTitle, Grid, TextField } from "@mui/material";
 import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { useState } from "react";
-import Alert from "../Alert";
 import { apikey, isbnapi, url } from '../config';
+import Alert from "./Alert";
 function AddBooks({ done }: { done: (id: string) => void }) {
     const [info, setInfo] = useState<{
         name: string;
@@ -68,7 +68,6 @@ function AddBooks({ done }: { done: (id: string) => void }) {
 
                 },
                 err => {
-                    console.log(err);
                     setAlertinfo({ open: true, message: "Network error" });
                     setLoading(false);
                     //done(info.isbn);
@@ -103,7 +102,6 @@ function AddBooks({ done }: { done: (id: string) => void }) {
                     setFetching(false);
                 },
                 err => {
-                    console.log(err);
                     setAlertinfo({ open: true, message: "Network error" });
                     setFetching(false);
                 }

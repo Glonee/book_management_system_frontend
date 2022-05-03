@@ -1,6 +1,6 @@
 //错误边界，当应用发生未被catch的error时会显示这个页面
-import { Component, ErrorInfo, ReactNode } from "react";
 import { Alert, Container } from "@mui/material";
+import { Component, ErrorInfo, ReactNode } from "react";
 class ErrorBoundary extends Component<{ children?: ReactNode }, { hasError: boolean }> {
     constructor(props: { children?: ReactNode }) {
         super(props);

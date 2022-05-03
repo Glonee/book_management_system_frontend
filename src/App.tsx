@@ -6,19 +6,18 @@ import { CssBaseline } from '@mui/material';
 import { lazy } from 'react';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import Base from './Base';
+import Sus from './Components/Sus';
 import { homepage } from './config';
 import ErrorBoundary from './ErrorBoundary';
 import NavigatePage from './NavigatePage';
-import Borrow from './Pages/Borrow';
-import Sus from './Sus';
 //以上为常规import，以下为懒加载import
 //懒加载（即打开这个页面时才加载）需要将懒加载组件包裹在Suspense(或我已封装的Sus)组件内才能使用
 //嫌麻烦可以不使用懒加载，直接import
-const Signin = lazy(() => import('./Signin'));
-const Signup = lazy(() => import('./Signup'));
+const Signin = lazy(() => import('./Pages/Signin'));
+const Signup = lazy(() => import('./Pages/Signup'));
 const Home = lazy(() => import('./Pages/Home'));
 const Books = lazy(() => import('./Pages/Books'));
-const ModBooks = lazy(() => import('./Pages/ModBooks'));
+const Borrow = lazy(() => import('./Pages/Borrow'));
 //用户的菜单栏
 const userpages = [
     { name: "Home", to: homepage },

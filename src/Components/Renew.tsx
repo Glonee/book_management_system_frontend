@@ -1,8 +1,8 @@
-import { Button, Container, DialogActions, DialogContent, DialogContentText, DialogTitle, TextField } from "@mui/material";
+import { Button, DialogActions, DialogContent, DialogTitle, TextField } from "@mui/material";
 import { useState } from "react";
-import { borrowitem } from "./Borrow";
 import { url } from "../config";
-import Alert from "../Alert";
+import { borrowitem } from "../Pages/Borrow";
+import Alert from "./Alert";
 export default function Renew({ item, done }: { item: borrowitem, done: () => void }) {
     const [days, setDays] = useState("");
     const [open, setOpen] = useState(false);
@@ -27,10 +27,7 @@ export default function Renew({ item, done }: { item: borrowitem, done: () => vo
                         setOpen(true);
                     }
                 },
-                err => {
-                    console.log(err);
-                    setOpen(true);
-                }
+                () => setOpen(true)
             )
     }
     return (

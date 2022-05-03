@@ -2,7 +2,7 @@
 import { Box, Button, Container, Link, TextField, Typography } from "@mui/material";
 import { useState } from "react";
 import { Link as RouterLink, useNavigate } from "react-router-dom";
-import { homepage, url } from './config';
+import { homepage, url } from '../config';
 function Signup(): JSX.Element {
     const [user, setUser] = useState("");
     const [email, setEmail] = useState("");
@@ -14,7 +14,6 @@ function Signup(): JSX.Element {
     function handleSubbmit(): void {
         if (user !== "" && pwd !== "" && pwd === repwd) {
             setLoadding(true);
-            console.log({ email: user, password: pwd });
             fetch(`${url}/user`, {
                 method: 'POST',
                 mode: 'cors',
@@ -26,7 +25,7 @@ function Signup(): JSX.Element {
                     birth: "2001-05-19"
                 })
             })
-                .then(res => res.json(), err => console.log(err))
+                .then(res => res.json())
                 .then(obj => {
                     if (obj !== undefined) {
                         navigate(homepage === "/" ? "/signin" : `${homepage}/signin`, { replace: true });

@@ -1,10 +1,19 @@
-import { Box, TextField, Button, AlertColor, DialogActions, DialogContent, DialogTitle, Grid } from "@mui/material";
+import {
+    AlertColor,
+    Box,
+    Button,
+    DialogActions,
+    DialogContent,
+    DialogTitle,
+    Grid,
+    TextField
+} from "@mui/material";
+import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
+import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import { useState } from "react";
 import { url } from '../config';
-import Alert from "../Alert";
-import { LocalizationProvider, DatePicker } from "@mui/x-date-pickers";
-import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
-import { book as booktype } from './Books';
+import { book as booktype } from '../Pages/Books';
+import Alert from "./Alert";
 function ModBooks({ book, done }: { book: booktype, done: () => void }) {
     const [info, setInfo] = useState<{
         name: string;
@@ -69,7 +78,6 @@ function ModBooks({ book, done }: { book: booktype, done: () => void }) {
                     setLoading(false);
                 },
                 err => {
-                    console.log(err);
                     setAlertinfo({ open: true, message: "Network error", servrity: "error" });
                     setLoading(false);
                 }

@@ -1,5 +1,5 @@
-import { DialogContent, DialogActions, Button, DialogContentText } from "@mui/material";
-export default function Payfine({ fine, done }: { fine: number, done: () => void }) {
+import { Button, DialogActions, DialogContent, DialogContentText } from "@mui/material";
+export default function Payfine({ done }: { done: () => void }) {
     return (
         <>
             <DialogContent>

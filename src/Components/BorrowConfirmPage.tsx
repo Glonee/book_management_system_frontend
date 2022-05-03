@@ -1,8 +1,8 @@
 import { Button, DialogActions, DialogContent, DialogTitle, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
 import { url } from "../config";
-import { book as typeofbook } from "./Books";
-import Alert from "../Alert";
+import { book as typeofbook } from "../Pages/Books";
+import Alert from "./Alert";
 export default function BorrowConfirm({ isbn, user, done }: { isbn: string, user: string, done: (id: string) => void }) {
     const [alertinfo, setAlertinfo] = useState({ open: false, message: "" });
     const [loading, setLoading] = useState(false);
@@ -29,7 +29,6 @@ export default function BorrowConfirm({ isbn, user, done }: { isbn: string, user
                     setLoading(false);
                 },
                 err => {
-                    console.log(err);
                     setAlertinfo({ open: true, message: "Network error" });
                     setLoading(false);
                 }
@@ -58,7 +57,6 @@ export default function BorrowConfirm({ isbn, user, done }: { isbn: string, user
                     setLoading(false);
                 },
                 err => {
-                    console.log(err);
                     setAlertinfo({ open: true, message: "Network error" });
                     setLoading(false);
                 }

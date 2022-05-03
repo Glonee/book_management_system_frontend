@@ -1,7 +1,9 @@
 //注册页
-import { Box, Button, Container, Link, TextField, Typography } from "@mui/material";
+import { Box, Button, Container, Dialog, DialogActions, DialogContent, DialogTitle, Link, TextField, Typography } from "@mui/material";
 import { useState } from "react";
 import { Link as RouterLink, useNavigate } from "react-router-dom";
+import Alert from "../Components/Alert";
+import Barcode from "../Components/Barcode";
 import { homepage, url } from '../config';
 function Signup(): JSX.Element {
     const [user, setUser] = useState("");
@@ -9,10 +11,13 @@ function Signup(): JSX.Element {
     const [pwd, setPwd] = useState("");
     const [repwd, setRepwd] = useState("");
     const [loadding, setLoadding] = useState(false);
+    const [open, setOpen] = useState(false);
+    const [openBarcode, setOpenBarcode] = useState(false);
     const navigate = useNavigate();
     const isUseremail = isEmail(email);
+    const navigateToSignin = () => navigate(homepage === "/" ? "/signin" : `${homepage}/signin`, { replace: true });
     function handleSubbmit(): void {
-        if (user !== "" && pwd !== "" && pwd === repwd) {
+        if (user !== "" && isUseremail && pwd !== "" && pwd === repwd) {
             setLoadding(true);
             fetch(`${url}/user`, {
                 method: 'POST',
@@ -26,14 +31,16 @@ function Signup(): JSX.Element {
                 })
             })
                 .then(res => res.json())
-                .then(obj => {
-                    if (obj !== undefined) {
-                        navigate(homepage === "/" ? "/signin" : `${homepage}/signin`, { replace: true });
-                    } else {
-                        alert("ERROR!");
-                        setLoadding(false);
-                    }
-                })
+                .then(
+                    obj => {
+                        if (obj.state === 1) {
+                            setOpenBarcode(true)
+                        } else {
+                            setOpen(true);
+                        }
+                    },
+                    () => setOpen(true)
+                )
         }
     }
     function isEmail(text: string): boolean {
@@ -41,6 +48,26 @@ function Signup(): JSX.Element {
     }
     return (
         <Container component="main" maxWidth="xs">
+            <Alert
+                message="Error while registering"
+                open={open}
+                onClose={() => setOpen(false)}
+                servrity="error"
+            />
+            <Dialog
+                open={openBarcode}
+                onClose={navigateToSignin}
+            >
+                <DialogTitle>Success! Here is your barcode</DialogTitle>
+                <DialogContent>
+                    <Barcode data={user} height={150} width={3} />
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={navigateToSignin}>
+                        Done
+                    </Button>
+                </DialogActions>
+            </Dialog>
             <Box sx={{
                 alignItems: "center",
                 display: "flex",

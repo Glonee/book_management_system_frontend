@@ -1,7 +1,7 @@
-import { Box, Button, Card, CardActions, CardContent, Container, Grid, List, ListItemText, Typography } from '@mui/material';
+import { Avatar, Box, Button, Card, CardActions, CardContent, Container, Grid, List, ListItemText, Typography } from '@mui/material';
+import { blue } from '@mui/material/colors';
 import { useEffect, useMemo, useState } from 'react';
 import Alert from '../Components/Alert';
-import Barcode from '../Components/Barcode';
 import { url } from '../config';
 function Home({ mode }: { mode: "user" | "admin" }): JSX.Element {
     const [open, setOpen] = useState(false);
@@ -15,6 +15,7 @@ function Home({ mode }: { mode: "user" | "admin" }): JSX.Element {
     }[]>([]);
     const u = useMemo(() => localStorage.getItem(`${mode}name`), [mode]);
     const username = u === null ? "?" : u;
+    const u1 = username === "" ? "" : username[0];
     useEffect(() => {
         if (mode === "user") {
             fetch(`${url}/user`, {
@@ -49,7 +50,8 @@ function Home({ mode }: { mode: "user" | "admin" }): JSX.Element {
                 flexDirection: "column",
                 marginTop: 10
             }}>
-                <Barcode data={username} height={200} width={4} />
+                <Avatar sx={{ bgcolor: blue[400], height: 100, width: 100, mb: 3, fontSize: 70 }}>{u1}</Avatar>
+                <Typography variant='h4' component='p' sx={{ mb: 7 }}>Welcome, {username}</Typography>
                 <Grid container spacing={2} mb={3}>
                     <Grid item xs={12}>
                         <Card>

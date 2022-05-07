@@ -1,6 +1,5 @@
 import { Button, CircularProgress, Container, Dialog, DialogContent, Grid, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField } from '@mui/material';
 import { lazy, Suspense, useEffect, useState } from 'react';
-import { useSearchParams } from 'react-router-dom';
 import Alert from '../Components/Alert';
 import { url } from '../config';
 const Renew = lazy(() => import('../Components/Renew'));

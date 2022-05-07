@@ -1,5 +1,6 @@
 import { Button, CircularProgress, Container, Dialog, DialogContent, Grid, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField } from '@mui/material';
 import { lazy, Suspense, useEffect, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import Alert from '../Components/Alert';
 import { url } from '../config';
 const Renew = lazy(() => import('../Components/Renew'));
@@ -213,7 +214,12 @@ function Borrow({ mode }: { mode: "user" | "admin" }) {
                                             if (book.fine !== 0) {
                                                 setSelected(book);
                                                 setOpenPayFine(true);
-                                                window.open(`${url}/index1.jsp?bookid=${book.bookid}&isbn="${book.isbn}"&payFine=${book.fine}&name="${book.name}"`);
+                                                const payurl = new URL(`${url}/index1.jsp`);
+                                                payurl.searchParams.set("bookid", book.bookid);
+                                                payurl.searchParams.set("isbn", book.isbn);
+                                                payurl.searchParams.set("payFine", book.fine.toString());
+                                                payurl.searchParams.set("name", book.name);
+                                                window.open(payurl.href);
                                             } else {
                                                 returnBook(book.isbn, book.bookid, book.username)
                                             }

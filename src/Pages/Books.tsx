@@ -2,9 +2,7 @@ import AddIcon from '@mui/icons-material/Add';
 import {
     AlertColor,
     Button, CircularProgress, Container, Dialog, DialogActions, DialogContent,
-    DialogTitle, FormControl, Grid, InputLabel, List,
-    ListItem,
-    ListItemText, MenuItem, Select, Table,
+    DialogTitle, FormControl, Grid, InputLabel, MenuItem, Select, Table,
     TableBody,
     TableCell,
     TableContainer,
@@ -15,12 +13,13 @@ import {
 import { lazy, Suspense, useEffect, useMemo, useState } from 'react';
 import Alert from '../Components/Alert';
 import Barcode from '../Components/Barcode';
+import BookDetail from '../Components/BookDetail';
 import { url } from '../config';
 const AddBooks = lazy(() => import('../Components/AddBooks'));
 const BorrowConfirm = lazy(() => import('../Components/BorrowConfirmPage'));
 const ModBooks = lazy(() => import('../Components/ModBooks'));
 const DeleteBooks = lazy(() => import('../Components/DeleteBooks'));
-const bookprto = {
+export const bookprto = {
     name: "",
     author: "",
     isbn: "",
@@ -33,7 +32,19 @@ const bookprto = {
 };
 export type book = typeof bookprto;
 function Books({ mode }: { mode: "user" | "admin" }): JSX.Element {
-    const [books, setBooks] = useState<book[]>([]);
+    const [books, setBooks] = useState<book[]>([
+        {
+            author: "abc",
+            bclass: "aaa",
+            isbn: "9787040396638",
+            name: "cpp",
+            num: 10,
+            position: "A-10",
+            price: 100,
+            publish: "aa",
+            publish_date: "2012-05-01"
+        }
+    ]);
     const [openBorrow, setOpenBorrow] = useState(false);
     const [openAddBooks, setOpenAddBooks] = useState(false);
     const [openDetail, setOpenDetail] = useState(false);
@@ -48,11 +59,9 @@ function Books({ mode }: { mode: "user" | "admin" }): JSX.Element {
         serivity: AlertColor
     }>({ open: false, message: "", serivity: 'error' });
     const [loading, setLoading] = useState(false);
-    const [select, setSelect] = useState("");
-    const [bookid, setBookid] = useState("");
+    const [select, setSelect] = useState(bookprto);
     const u = useMemo(() => localStorage.getItem(`${mode}name`), [mode]);
     const username = u === null ? "" : u;
-    const selectedbook = books.find(value => value.isbn === select);
     const keys = Object.keys(bookprto) as (keyof book)[];
     useEffect(updateBooks, []);
     function updateBooks() {
@@ -96,48 +105,18 @@ function Books({ mode }: { mode: "user" | "admin" }): JSX.Element {
                 onClose={() => setOpenBorrow(false)}
             >
                 <Suspense fallback={<DialogContent><CircularProgress /></DialogContent>}>
-                    <BorrowConfirm isbn={select} user={username} done={id => { setBarcodes([id]); updateBooks(); setOpenBorrow(false); }} />
+                    <BorrowConfirm isbn={select.isbn} user={username} done={id => { setBarcodes([id]); updateBooks(); setOpenBorrow(false); }} />
                 </Suspense>
             </Dialog>
             <Dialog
                 open={openDetail}
-                onClose={() => { setOpenDetail(false); setBookid(""); }}
+                onClose={() => setOpenDetail(false)}
                 maxWidth="md"
                 fullWidth
             >
                 <DialogTitle>Detail</DialogTitle>
                 <DialogContent>
-                    <Grid container>
-                        <Grid item xs={4}>
-                            <List>
-                                {selectedbook !== undefined && keys.map(key => (
-                                    <ListItem>
-                                        <ListItemText key={key}>
-                                            {key}: {selectedbook[key]}
-                                        </ListItemText>
-                                    </ListItem>
-                                ))}
-                            </List>
-                        </Grid>
-                        <Grid item xs={8} sx={{display:'flex', flexDirection: 'column'}}>
-                            <FormControl margin='normal'>
-                                <InputLabel id="labelid">Bookid</InputLabel>
-                                <Select
-                                    labelId="labelid"
-                                    label="Bookid"
-                                    value={bookid}
-                                    onChange={e => setBookid(e.target.value)}
-                                >
-                                    {selectedbook !== undefined &&
-                                        Array.from(Array(+selectedbook.num).keys()).map((_, index) => (
-                                            <MenuItem key={index} value={index.toString()}>{index}</MenuItem>
-                                        ))
-                                    }
-                                </Select>
-                            </FormControl>
-                            {bookid !== "" && selectedbook !== undefined && <Barcode data={`${selectedbook.isbn}/${bookid}/${selectedbook.position}`} />}
-                        </Grid>
-                    </Grid>
+                    <BookDetail book={select} />
                 </DialogContent>
                 <DialogActions>
                     {mode === "admin" &&
@@ -165,7 +144,7 @@ function Books({ mode }: { mode: "user" | "admin" }): JSX.Element {
                     >
                         <Suspense fallback={<DialogContent><CircularProgress /></DialogContent>}>
                             <ModBooks
-                                book={selectedbook as book}
+                                book={select}
                                 done={() => { updateBooks(); setOpenModify(false) }} />
                         </Suspense>
                     </Dialog>
@@ -177,7 +156,7 @@ function Books({ mode }: { mode: "user" | "admin" }): JSX.Element {
                     >
                         <Suspense fallback={<DialogContent><CircularProgress /></DialogContent>}>
                             <DeleteBooks
-                                book={selectedbook as book}
+                                book={select}
                                 done={() => { updateBooks(); setOpenDelete(false); }}
                             />
                         </Suspense>
@@ -242,7 +221,7 @@ function Books({ mode }: { mode: "user" | "admin" }): JSX.Element {
                             <TableRow
                                 key={book.isbn}
                                 hover
-                                onClick={() => { setSelect(book.isbn); setOpenDetail(true); }}
+                                onClick={() => { setSelect(book); setOpenDetail(true); }}
                             >
                                 <TableCell>{book.name}</TableCell>
                                 <TableCell>{book.author}</TableCell>

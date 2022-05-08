@@ -82,9 +82,12 @@ function Books({ mode }: { mode: "user" | "admin" }): JSX.Element {
                 maxWidth="lg"
             >
                 <DialogTitle>Barcodes</DialogTitle>
-                <DialogContent sx={{ display: 'flex', flexDirection: 'column' }}>
+                <DialogContent>
                     {barcodes.map(barcode => (
-                        <Barcode key={barcode} data={barcode} />
+                        <>
+                            <Barcode key={barcode} data={barcode} />
+                            <br />
+                        </>
                     ))}
                 </DialogContent>
             </Dialog>
@@ -93,18 +96,18 @@ function Books({ mode }: { mode: "user" | "admin" }): JSX.Element {
                 onClose={() => setOpenBorrow(false)}
             >
                 <Suspense fallback={<DialogContent><CircularProgress /></DialogContent>}>
-                    <BorrowConfirm isbn={select.isbn} user={username} done={id => { setBarcodes([id]); updateBooks(); setOpenBorrow(false); }} />
+                    <BorrowConfirm book={select} user={username} done={id => { setBarcodes([id]); updateBooks(); setOpenBorrow(false); }} />
                 </Suspense>
             </Dialog>
             <Dialog
                 open={openDetail}
                 onClose={() => setOpenDetail(false)}
-                maxWidth="md"
+                maxWidth="lg"
                 fullWidth
             >
                 <DialogTitle>Detail</DialogTitle>
                 <DialogContent>
-                    <BookDetail book={select} />
+                    <BookDetail book={select} admin={mode === "admin"} />
                 </DialogContent>
                 <DialogActions>
                     {mode === "admin" &&

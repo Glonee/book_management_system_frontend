@@ -130,7 +130,7 @@ function Borrow({ mode }: { mode: "user" | "admin" }) {
                 <Grid container spacing={2}>
                     <Dialog
                         open={openPayFine}
-                        onClose={() => setOpenPayFine(false)}
+                        onClose={() => {}}
                     >
                         <Suspense fallback={<DialogContent><CircularProgress /></DialogContent>}>
                             <Payfine
@@ -214,10 +214,10 @@ function Borrow({ mode }: { mode: "user" | "admin" }) {
                                                 setSelected(book);
                                                 setOpenPayFine(true);
                                                 const payurl = new URL(`${url}/index1.jsp`);
-                                                payurl.searchParams.set("bookid", book.bookid);
-                                                payurl.searchParams.set("isbn", book.isbn);
-                                                payurl.searchParams.set("payFine", book.fine.toString());
-                                                payurl.searchParams.set("name", book.name);
+                                                payurl.searchParams.set("bookid", `"${book.bookid}"`);
+                                                payurl.searchParams.set("isbn", `"${book.isbn}"`);
+                                                payurl.searchParams.set("payFine", `"${book.fine.toString()}"`);
+                                                payurl.searchParams.set("name", `"${book.name}"`);
                                                 window.open(payurl.href);
                                             } else {
                                                 returnBook(book.isbn, book.bookid, book.username)

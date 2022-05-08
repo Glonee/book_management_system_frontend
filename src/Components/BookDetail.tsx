@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { book as booktype, bookprto } from "../Pages/Books";
 import Barcode from "./Barcode";
 import { isbnapi, apikey } from "../config";
-export default function BookDetail({ book }: { book: booktype }) {
+export default function BookDetail({ book, admin }: { book: booktype, admin: boolean }) {
     const [bookid, setBookid] = useState("");
     const [imgsrc, setimgsrc] = useState("");
     const keys = Object.keys(bookprto) as (keyof booktype)[];
@@ -27,12 +27,11 @@ export default function BookDetail({ book }: { book: booktype }) {
     }, [book.isbn]);
     return (
         <Grid container>
-            <Grid item xs={6} sx={{ display: 'flex', flexDirection: 'column' }}>
-                <img src={imgsrc} alt={book.name} loading="lazy"/>
-                {bookid !== "" && <Barcode data={`${book.isbn}/${bookid}/${book.position}`} />}
+            <Grid item xs={4} sx={{ display: 'flex', flexDirection: 'column' }}>
+                <img src={imgsrc} alt={book.name} loading="lazy" />
             </Grid>
-            <Grid item xs={6}>
-                <FormControl margin='normal' sx={{minWidth:300}}>
+            <Grid item xs={admin ? 8 : 6}>
+                {admin && <FormControl margin='normal' sx={{ minWidth: 200 }}>
                     <InputLabel id="labelid">Bookid</InputLabel>
                     <Select
                         labelId="labelid"
@@ -46,7 +45,7 @@ export default function BookDetail({ book }: { book: booktype }) {
                             ))
                         }
                     </Select>
-                </FormControl>
+                </FormControl>}
                 <List>
                     {keys.map(key => (
                         <ListItem>
@@ -57,6 +56,9 @@ export default function BookDetail({ book }: { book: booktype }) {
                     ))}
                 </List>
             </Grid>
+            {admin &&<Grid item xs={5}>
+                {bookid !== "" && <Barcode data={`${book.isbn}/${bookid}/${book.position}`} />}
+            </Grid>}
         </Grid>
     )
 }

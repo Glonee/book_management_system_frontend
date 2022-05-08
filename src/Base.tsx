@@ -1,16 +1,10 @@
 //菜单栏
-import { AppBar, Button, Toolbar, Tab, TabProps, Tabs } from "@mui/material";
-import { useEffect, useState } from "react";
-import { Outlet, useNavigate } from "react-router-dom";
+import { AppBar, Button, Toolbar, Tab, Tabs } from "@mui/material";
+import { useEffect } from "react";
+import { Outlet, useNavigate, useLocation, Link } from "react-router-dom";
 import { homepage } from './config';
-function NavTab(props: TabProps & { to: string }) {
-    const navigate = useNavigate();
-    const { to, ...prop } = props;
-    return <Tab onClick={() => navigate(to, { replace: true })} {...prop} />
-}
 function Base({ pages, mode }: { pages: { name: string, to: string }[], mode: "user" | "admin" }): JSX.Element {
-    const [selected, setSelected] = useState(0);
-
+    const curpath = useLocation().pathname;
     const navigate = useNavigate();
     useEffect(() => {
         if (localStorage.getItem(`${mode}token`) === null) {
@@ -26,12 +20,11 @@ function Base({ pages, mode }: { pages: { name: string, to: string }[], mode: "u
                 <Toolbar>
                     <Tabs
                         textColor="inherit"
-                        onChange={(_, v) => setSelected(v)}
-                        value={selected}
+                        value={curpath}
                         sx={{ width: "100%" }}
                     >
                         {pages.map(page => (
-                            <NavTab to={page.to} key={page.name} label={page.name} />
+                            <Tab key={1} component={Link} to={page.to} value={page.to} label={page.name} />
                         ))}
                     </Tabs>
                     <Button

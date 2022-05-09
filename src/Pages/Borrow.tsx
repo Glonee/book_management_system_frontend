@@ -16,8 +16,7 @@ const itemprto = {
 };
 export type borrowitem = typeof itemprto;
 function Borrow({ mode }: { mode: "user" | "admin" }) {
-    const u = localStorage.getItem(`${mode}name`);
-    const [username, setUsername] = useState(mode === "admin" ? "" : (u === null ? "" : u));
+    const [username, setUsername] = useState("");
     const [borrowed, setBorrowed] = useState<borrowitem[]>([]);
     const [alertinfo, setAlertinfo] = useState({ open: false, message: "" });
     const [openPayFine, setOpenPayFine] = useState(false);
@@ -130,7 +129,7 @@ function Borrow({ mode }: { mode: "user" | "admin" }) {
                 <Grid container spacing={2}>
                     <Dialog
                         open={openPayFine}
-                        onClose={() => {}}
+                        onClose={() => { }}
                     >
                         <Suspense fallback={<DialogContent><CircularProgress /></DialogContent>}>
                             <Payfine
@@ -149,7 +148,6 @@ function Borrow({ mode }: { mode: "user" | "admin" }) {
                             onChange={e => setUsername(e.target.value)}
                             type="text"
                             fullWidth
-                            margin='normal'
                         />
                     </Grid>
                     <Grid item md={2} xs={4}>
@@ -203,6 +201,7 @@ function Borrow({ mode }: { mode: "user" | "admin" }) {
                                             setSelected(book);
                                             setOpenRenew(true);
                                         }}
+                                        disabled={book.fine !== 0}
                                     >
                                         Renew
                                     </Button>

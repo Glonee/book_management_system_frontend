@@ -1,6 +1,8 @@
+import { Button, Dialog, DialogActions, DialogContent, DialogTitle, IconButton, List, ListItem, ListItemText } from "@mui/material";
 import { useRef, useState } from "react";
 import { url } from "../config";
-import { book as booktype } from '../Pages/Books'
+import { book as booktype } from '../Pages/Books';
+import DeleteIcon from '@mui/icons-material/Delete';
 function ShoppingCart({ user, books, done, remove }: {
     user: string,
     books: booktype[],
@@ -43,6 +45,55 @@ function ShoppingCart({ user, books, done, remove }: {
                 setLoading(false);
             })
     }
-    return <button onClick={borrowMany}>BorrowMany</button>
+    return (
+        <>
+            <Dialog
+                open={failedbooks.length !== 0}
+                onClose={() => { setFailedbooks([]); done(barcodes.current) }}
+            >
+                <DialogTitle>Can't borrow following books</DialogTitle>
+                <DialogContent>
+                    <List>
+                        {failedbooks.map(book => (
+                            <ListItem key={book.isbn}>
+                                <ListItemText
+                                    primary={book.name}
+                                    secondary={`isbn: ${book.isbn}`}
+                                />
+                            </ListItem>
+                        ))}
+                    </List>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={() => { setFailedbooks([]); done(barcodes.current) }}>
+                        OK
+                    </Button>
+                </DialogActions>
+            </Dialog>
+            <DialogTitle>Shopping Cart</DialogTitle>
+            <DialogContent>
+                <List>
+                    {books.map(book => (
+                        <ListItem
+                            key={book.isbn}
+                            secondaryAction={
+                                <IconButton edge="end" onClick={() => remove(book.isbn)}>
+                                    <DeleteIcon />
+                                </IconButton>
+                            }
+                        >
+                            <ListItemText
+                                primary={book.name}
+                                secondary={`isbn: ${book.isbn}`}
+                            />
+                        </ListItem>
+                    ))}
+                </List>
+            </DialogContent>
+            <DialogActions>
+                <Button onClick={borrowMany} disabled={loading}>Check out</Button>
+            </DialogActions>
+        </>
+    )
 }
 export default ShoppingCart;

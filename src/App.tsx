@@ -18,17 +18,23 @@ const Signup = lazy(() => import('./Pages/Signup'));
 const Home = lazy(() => import('./Pages/Home'));
 const Books = lazy(() => import('./Pages/Books'));
 const Borrow = lazy(() => import('./Pages/Borrow'));
+const History = lazy(() => import('./Pages/History'));
+const Reserve = lazy(() => import('./Pages/Reverse'));
 //用户的菜单栏
 const userpages = [
     { name: "Home", to: homepage },
     { name: "Books", to: `${homepage}/books` },
-    { name: "Borrowed", to: `${homepage}/borrow` }
+    { name: "Borrowed", to: `${homepage}/borrow` },
+    { name: "History", to: `${homepage}/history}` },
+    { name: "Reserve", to: `${homepage}/reserve` }
 ];
 //管理员的菜单栏
 const adminpages = [
     { name: "Home", to: `${homepage}/admin` },
     { name: "Books", to: `${homepage}/admin/books` },
-    { name: "Borrowed", to: `${homepage}/admin/borrow` }
+    { name: "Borrowed", to: `${homepage}/admin/borrow` },
+    { name: "History", to: `${homepage}/admin/history` },
+    { name: "Reserve", to: `${homepage}/admin/reserve` }
 ]
 function App(): JSX.Element {
     return (
@@ -43,6 +49,8 @@ function App(): JSX.Element {
                             <Route index element={<Sus><Home mode="user" /></Sus>} />
                             <Route path="books" element={<Sus><Books mode="user" /></Sus>} />
                             <Route path="borrow" element={<Sus><Borrow mode="user" /></Sus>} />
+                            <Route path="history" element={<Sus><History mode="user" /></Sus>} />
+                            <Route path="reserve" element={<Sus><Reserve mode="user" /></Sus>} />
                         </Route>
                         <Route path="signin" element={<Sus><Signin mode="user" /></Sus>} />
                         <Route path="signup" element={<Sus><Signup /></Sus>} />
@@ -52,6 +60,8 @@ function App(): JSX.Element {
                                 <Route index element={<Sus><Home mode="admin" /></Sus>} />
                                 <Route path="books" element={<Sus><Books mode="admin" /></Sus>} />
                                 <Route path="borrow" element={<Sus><Borrow mode="admin" /></Sus>} />
+                                <Route path="history" element={<Sus><History mode="admin" /></Sus>} />
+                                <Route path="reserve" element={<Sus><Reserve mode="admin" /></Sus>} />
                             </Route>
                             <Route path="signin" element={<Sus><Signin mode="admin" /></Sus>} />
                         </Route>

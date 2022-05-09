@@ -8,17 +8,20 @@ import {
     TableContainer,
     TableHead,
     TableRow,
-    TextField
+    TextField,
+    Fab
 } from '@mui/material';
 import { lazy, Suspense, useEffect, useMemo, useState } from 'react';
 import Alert from '../Components/Alert';
 import Barcode from '../Components/Barcode';
 import BookDetail from '../Components/BookDetail';
 import { url } from '../config';
+import ShoppingCartIcon from '@mui/icons-material/ShoppingCart'
 const AddBooks = lazy(() => import('../Components/AddBooks'));
 const BorrowConfirm = lazy(() => import('../Components/BorrowConfirmPage'));
 const ModBooks = lazy(() => import('../Components/ModBooks'));
 const DeleteBooks = lazy(() => import('../Components/DeleteBooks'));
+const ShoppingCart = lazy(() => import('../Components/ShoppingCart'));
 export const bookprto = {
     name: "",
     author: "",
@@ -27,6 +30,7 @@ export const bookprto = {
     bclass: "",
     num: 0,
     price: 0,
+    sum: 0,
     position: "",
     publish_date: ""
 };
@@ -38,6 +42,7 @@ function Books({ mode }: { mode: "user" | "admin" }): JSX.Element {
     const [openDetail, setOpenDetail] = useState(false);
     const [openModify, setOpenModify] = useState(false);
     const [openDelete, setOpenDelete] = useState(false);
+    const [openCart, setOpenCart] = useState(false);
     const [selectBy, setSelectBy] = useState<keyof book>("name");
     const [searchText, setSearchText] = useState("");
     const [barcodes, setBarcodes] = useState<string[]>([]);
@@ -48,10 +53,16 @@ function Books({ mode }: { mode: "user" | "admin" }): JSX.Element {
     }>({ open: false, message: "", serivity: 'error' });
     const [loading, setLoading] = useState(false);
     const [select, setSelect] = useState(bookprto);
+    const [cart, setCart] = useState<book[]>([]);
     const u = useMemo(() => localStorage.getItem(`${mode}name`), [mode]);
     const username = u === null ? "" : u;
     const keys = Object.keys(bookprto) as (keyof book)[];
     useEffect(updateBooks, []);
+    useEffect(() => {
+        if (cart.length === 0) {
+            setOpenCart(false);
+        }
+    }, [cart]);
     function updateBooks() {
         setLoading(true);
         fetch(`${url}/book`, {
@@ -68,8 +79,36 @@ function Books({ mode }: { mode: "user" | "admin" }): JSX.Element {
                 }
             )
     }
+    function reserve() {
+        fetch(`${url}/user`, {
+            method: 'POST',
+            mode: 'cors',
+            body: JSON.stringify({
+                action: "reserve",
+                username: username,
+                isbn: select.isbn
+            })
+        })
+            .then(res => res.json())
+            .then(
+                obj => {
+                    if (obj.state === 0) {
+                        setAlertinfo({ open: true, message: "Failed to reserve", serivity: "error" });
+                    }
+                },
+                () => setAlertinfo({ open: true, message: "Network error", serivity: "error" })
+            )
+    }
     return (
         <Container maxWidth="lg">
+            {cart.length !== 0 &&
+                <Fab
+                    onClick={() => setOpenCart(true)}
+                    color="primary"
+                    sx={{ position: "absolute", right: 50, bottom: 50 }}
+                >
+                    <ShoppingCartIcon />
+                </Fab>}
             <Alert
                 open={alertinfo.open}
                 onClose={() => setAlertinfo(pre => ({ ...pre, open: false }))}
@@ -86,7 +125,7 @@ function Books({ mode }: { mode: "user" | "admin" }): JSX.Element {
                     {barcodes.map(barcode => (
                         <>
                             <Barcode key={barcode} data={barcode} />
-                            <br />
+                            <br key={barcode} />
                         </>
                     ))}
                 </DialogContent>
@@ -97,6 +136,21 @@ function Books({ mode }: { mode: "user" | "admin" }): JSX.Element {
             >
                 <Suspense fallback={<DialogContent><CircularProgress /></DialogContent>}>
                     <BorrowConfirm book={select} user={username} done={id => { setBarcodes([id]); updateBooks(); setOpenBorrow(false); }} />
+                </Suspense>
+            </Dialog>
+            <Dialog
+                open={openCart}
+                onClose={() => setOpenCart(false)}
+                maxWidth="xs"
+                fullWidth
+            >
+                <Suspense fallback={<DialogContent><CircularProgress /></DialogContent>}>
+                    <ShoppingCart
+                        books={cart}
+                        user={username}
+                        done={ids => { setCart([]); setOpenCart(false); setBarcodes(ids) }}
+                        remove={isbn => setCart(books => books.filter(book => book.isbn !== isbn))}
+                    />
                 </Suspense>
             </Dialog>
             <Dialog
@@ -116,7 +170,16 @@ function Books({ mode }: { mode: "user" | "admin" }): JSX.Element {
                             <Button color="warning" onClick={() => { setOpenModify(true); setOpenDetail(false); }}>Modify</Button>
                         </>
                     }
-                    <Button onClick={() => { setOpenBorrow(true); setOpenDetail(false); }}>Borrow</Button>
+                    <Button
+                        onClick={() => { setCart(precart => [...precart, select]); setOpenDetail(false) }}
+                        disabled={cart.length >= 5 || cart.find(book => book.isbn === select.isbn) !== undefined}
+                    >
+                        Add to cart
+                    </Button>
+                    {select.num !== 0 ?
+                        <Button onClick={() => { setOpenBorrow(true); setOpenDetail(false); }}>Borrow</Button> :
+                        <Button onClick={reserve}>Reserve</Button>
+                    }
                 </DialogActions>
             </Dialog>
             {mode === "admin" &&
@@ -205,6 +268,7 @@ function Books({ mode }: { mode: "user" | "admin" }): JSX.Element {
                             <TableCell align='right'>Publish date</TableCell>
                             <TableCell align='right'>ISBN</TableCell>
                             <TableCell align='right'>Num</TableCell>
+                            <TableCell align='right'>Total</TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
@@ -221,6 +285,7 @@ function Books({ mode }: { mode: "user" | "admin" }): JSX.Element {
                                 <TableCell align='right'>{book.publish_date}</TableCell>
                                 <TableCell align='right'>{book.isbn}</TableCell>
                                 <TableCell align='right'>{book.num}</TableCell>
+                                <TableCell align='right'>{book.sum}</TableCell>
                             </TableRow>
                         ))}
                     </TableBody>

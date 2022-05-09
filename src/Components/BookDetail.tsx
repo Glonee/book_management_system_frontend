@@ -56,7 +56,7 @@ export default function BookDetail({ book, admin }: { book: booktype, admin: boo
                     ))}
                 </List>
             </Grid>
-            {admin &&<Grid item xs={5}>
+            {admin && <Grid item xs={5}>
                 {bookid !== "" && <Barcode data={`${book.isbn}/${bookid}/${book.position}`} />}
             </Grid>}
         </Grid>

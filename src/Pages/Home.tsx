@@ -5,37 +5,44 @@ import Alert from '../Components/Alert';
 import { url } from '../config';
 function Home({ mode }: { mode: "user" | "admin" }): JSX.Element {
     const [open, setOpen] = useState(false);
-    const [borrowed, setBorrowed] = useState<{
-        borrow_date: string,
-        deadline: string,
-        fine: number,
-        isbn: string,
-        name: string,
-        num: number
-    }[]>([]);
+    const [num, setNum] = useState(0);
+    const [overduebooks, setOverduebooks] = useState(0);
+    const [bookavailable, setBookavailable] = useState(0);
     const u = useMemo(() => localStorage.getItem(`${mode}name`), [mode]);
     const username = u === null ? "?" : u;
     const u1 = username === "" ? "" : username[0];
+    const messages = [
+        `You have ${overduebooks} over due book.`,
+        `${bookavailable} of your reserved book is available.`
+    ];
     useEffect(() => {
-        if (mode === "user") {
-            fetch(`${url}/user`, {
-                method: 'POST',
-                mode: 'cors',
-                body: JSON.stringify({
-                    action: "getBorrowingList",
-                    username: localStorage.getItem(`${mode}name`)
-                })
+        fetch(`${url}/user`, {
+            method: 'POST',
+            mode: 'cors',
+            body: JSON.stringify({
+                action: "getBorrowingList",
+                username: username
             })
-                .then(res => res.json())
-                .then(
-                    obj => { if (obj !== undefined) { setBorrowed(obj) } },
-                    () => setOpen(true)
-                );
-        }
-    }, [mode]);
-    const overduebooks = borrowed.filter(book => book.fine !== 0).length;
-    const num = borrowed.length;
-    const messages = [`You have ${overduebooks} over due book!`];
+        })
+            .then(res => res.json())
+            .then(
+                obj => { setNum(obj.length); setOverduebooks(obj.filter((book: any) => book.fine !== 0).length) },
+                () => setOpen(true)
+            );
+        fetch(`${url}/user`, {
+            method: 'POST',
+            mode: 'cors',
+            body: JSON.stringify({
+                action: "getReserveList",
+                username: username
+            })
+        })
+            .then(res => res.json())
+            .then(
+                obj => setBookavailable(obj.filter((book: any) => book.hasbook).length),
+                () => setOpen(true)
+            )
+    }, [username]);
     return (
         <Container maxWidth="md" component="main">
             <Alert

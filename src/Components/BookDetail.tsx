@@ -28,7 +28,7 @@ export default function BookDetail({ book, admin }: { book: booktype, admin: boo
     return (
         <Grid container>
             <Grid item xs={4} sx={{ display: 'flex', flexDirection: 'column' }}>
-                <img src={imgsrc} alt={book.name} loading="lazy" />
+                <img src={imgsrc} alt={book.name} loading="lazy" referrerPolicy="no-referrer" />
             </Grid>
             <Grid item xs={admin ? 8 : 6}>
                 {admin && <FormControl margin='normal' sx={{ minWidth: 200 }}>

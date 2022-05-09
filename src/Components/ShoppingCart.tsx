@@ -1,12 +1,17 @@
+import { useRef, useState } from "react";
 import { url } from "../config";
 import { book as booktype } from '../Pages/Books'
-export interface responsetype {
-    ok: boolean;
-    isbn: string;
-    bookid: string;
-}
-function ShoppingCart({ user, books, done }: { user: string, books: booktype[], done: (response: responsetype[]) => void }) {
+function ShoppingCart({ user, books, done, remove }: {
+    user: string,
+    books: booktype[],
+    done: (bookids: string[]) => void,
+    remove: (isbn: string) => void
+}): JSX.Element {
+    const [failedbooks, setFailedbooks] = useState<booktype[]>([]);
+    const [loading, setLoading] = useState(false);
+    const barcodes = useRef<string[]>([]);
     function borrowMany() {
+        setLoading(true);
         Promise.all(books.map(book => fetch(`${url}/user`, {
             method: 'POST',
             mode: 'cors',
@@ -21,13 +26,22 @@ function ShoppingCart({ user, books, done }: { user: string, books: booktype[], 
             .then(
                 obj => {
                     if (obj.state === 0) {
-                        return { ok: true, isbn: book.isbn, bookid: obj.bookid as string }
+                        return { ok: true, book: book, bookid: obj.bookid as string }
                     } else {
-                        return { ok: false, isbn: book.isbn, bookid: "" }
+                        return { ok: false, book: book, bookid: "" }
                     }
                 },
-                () => ({ ok: false, isbn: book.isbn, bookid: "" })
-            ))).then(values => done(values))
+                () => ({ ok: false, book: book, bookid: "" })
+            ))).then(values => {
+                const successed = values.filter(value => value.ok).map(value => `${value.book.isbn}/${value.bookid}/${value.book.position}`);
+                if (successed.length === books.length) {
+                    done(successed);
+                } else {
+                    barcodes.current = successed;
+                    setFailedbooks(values.filter(value => !value.ok).map(value => value.book));
+                }
+                setLoading(false);
+            })
     }
     return <button onClick={borrowMany}>BorrowMany</button>
 }

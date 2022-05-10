@@ -1,7 +1,7 @@
 import AddIcon from '@mui/icons-material/Add';
 import {
     AlertColor,
-    Button, CircularProgress, Container, Dialog, DialogActions, DialogContent,
+    Button, CircularProgress, Container, Dialog, DialogContent,
     DialogTitle, FormControl, Grid, InputLabel, MenuItem, Select, Table,
     TableBody,
     TableCell,
@@ -22,6 +22,7 @@ const BorrowConfirm = lazy(() => import('../Components/BorrowConfirmPage'));
 const ModBooks = lazy(() => import('../Components/ModBooks'));
 const DeleteBooks = lazy(() => import('../Components/DeleteBooks'));
 const ShoppingCart = lazy(() => import('../Components/ShoppingCart'));
+const ReserveConfirm = lazy(() => import('../Components/ReserveComfirmPage'));
 export const bookprto = {
     name: "",
     author: "",
@@ -43,6 +44,7 @@ function Books({ mode }: { mode: "user" | "admin" }): JSX.Element {
     const [openModify, setOpenModify] = useState(false);
     const [openDelete, setOpenDelete] = useState(false);
     const [openCart, setOpenCart] = useState(false);
+    const [openReserve, setOpenReserve] = useState(false);
     const [selectBy, setSelectBy] = useState<keyof book>("name");
     const [searchText, setSearchText] = useState("");
     const [barcodes, setBarcodes] = useState<string[]>([]);
@@ -77,26 +79,6 @@ function Books({ mode }: { mode: "user" | "admin" }): JSX.Element {
                     setAlertinfo({ open: true, message: "Network error", serivity: "error" });
                     setLoading(false);
                 }
-            )
-    }
-    function reserve() {
-        fetch(`${url}/user`, {
-            method: 'POST',
-            mode: 'cors',
-            body: JSON.stringify({
-                action: "reserve",
-                username: username,
-                isbn: select.isbn
-            })
-        })
-            .then(res => res.json())
-            .then(
-                obj => {
-                    if (obj.state === 0) {
-                        setAlertinfo({ open: true, message: "Failed to reserve", serivity: "error" });
-                    }
-                },
-                () => setAlertinfo({ open: true, message: "Network error", serivity: "error" })
             )
     }
     return (
@@ -139,8 +121,16 @@ function Books({ mode }: { mode: "user" | "admin" }): JSX.Element {
                 </Suspense>
             </Dialog>
             <Dialog
+                open={openReserve}
+                onClose={() => setOpenReserve(false)}
+            >
+                <Suspense fallback={<DialogContent><CircularProgress /></DialogContent>}>
+                    <ReserveConfirm book={select} user={username} done={() => setOpenReserve(false)} />
+                </Suspense>
+            </Dialog>
+            <Dialog
                 open={openCart}
-                onClose={() => setOpenCart(false)}
+                onClose={() => { if (!loading) { setOpenCart(false) } }}
                 maxWidth="xs"
                 fullWidth
             >
@@ -150,6 +140,8 @@ function Books({ mode }: { mode: "user" | "admin" }): JSX.Element {
                         user={username}
                         done={ids => { setCart([]); setOpenCart(false); setBarcodes(ids) }}
                         remove={isbn => setCart(books => books.filter(book => book.isbn !== isbn))}
+                        loading={loading}
+                        setLoading={setLoading}
                     />
                 </Suspense>
             </Dialog>
@@ -159,28 +151,16 @@ function Books({ mode }: { mode: "user" | "admin" }): JSX.Element {
                 maxWidth="lg"
                 fullWidth
             >
-                <DialogTitle>Detail</DialogTitle>
-                <DialogContent>
-                    <BookDetail book={select} admin={mode === "admin"} />
-                </DialogContent>
-                <DialogActions>
-                    {mode === "admin" &&
-                        <>
-                            <Button color="error" onClick={() => { setOpenDelete(true); setOpenDetail(false); }}>Delete</Button>
-                            <Button color="warning" onClick={() => { setOpenModify(true); setOpenDetail(false); }}>Modify</Button>
-                        </>
-                    }
-                    <Button
-                        onClick={() => { setCart(precart => [...precart, select]); setOpenDetail(false) }}
-                        disabled={cart.length >= 5 || cart.find(book => book.isbn === select.isbn) !== undefined}
-                    >
-                        Add to cart
-                    </Button>
-                    {select.num !== 0 ?
-                        <Button onClick={() => { setOpenBorrow(true); setOpenDetail(false); }}>Borrow</Button> :
-                        <Button onClick={reserve}>Reserve</Button>
-                    }
-                </DialogActions>
+                <BookDetail
+                    book={select}
+                    admin={mode === "admin"}
+                    addtocart={() => { setCart(precart => [...precart, select]); setOpenDetail(false); }}
+                    addcartdisabled={cart.length >= 5 || cart.find(book => book.isbn === select.isbn) !== undefined}
+                    deletebook={() => { setOpenDelete(true); setOpenDetail(false); }}
+                    modify={() => { setOpenModify(true); setOpenDetail(false); }}
+                    borrow={() => { setOpenBorrow(true); setOpenDetail(false); }}
+                    reserve={() => { setOpenReserve(true); setOpenDetail(false); }}
+                />
             </Dialog>
             {mode === "admin" &&
                 <>

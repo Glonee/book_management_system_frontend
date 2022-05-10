@@ -3,14 +3,15 @@ import { useRef, useState } from "react";
 import { url } from "../config";
 import { book as booktype } from '../Pages/Books';
 import DeleteIcon from '@mui/icons-material/Delete';
-function ShoppingCart({ user, books, done, remove }: {
+function ShoppingCart({ user, books, done, remove, loading, setLoading }: {
     user: string,
     books: booktype[],
     done: (bookids: string[]) => void,
-    remove: (isbn: string) => void
+    remove: (isbn: string) => void,
+    loading: boolean,
+    setLoading: (loading: boolean) => void
 }): JSX.Element {
     const [failedbooks, setFailedbooks] = useState<booktype[]>([]);
-    const [loading, setLoading] = useState(false);
     const barcodes = useRef<string[]>([]);
     function borrowMany() {
         setLoading(true);
@@ -77,7 +78,11 @@ function ShoppingCart({ user, books, done, remove }: {
                         <ListItem
                             key={book.isbn}
                             secondaryAction={
-                                <IconButton edge="end" onClick={() => remove(book.isbn)}>
+                                <IconButton
+                                    edge="end"
+                                    onClick={() => remove(book.isbn)}
+                                    disabled={loading}
+                                >
                                     <DeleteIcon />
                                 </IconButton>
                             }

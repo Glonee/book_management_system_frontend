@@ -2,29 +2,28 @@ import { Button, DialogActions, DialogContent, DialogTitle, Typography } from "@
 import { useState } from "react";
 import { url } from "../config";
 import Alert from "./Alert";
-import {book as booktype} from '../Pages/Books';
-export default function ReserveConfirm({ book, user, done }: { book: booktype, user: string, done: (id: string) => void }) {
+import { book as booktype } from '../Pages/Books';
+export default function ReserveComfirm({ book, user, done }: { book: booktype, user: string, done: () => void }) {
     const [alertinfo, setAlertinfo] = useState({ open: false, message: "" });
     const [loading, setLoading] = useState(false);
-    function borrow() {
+    function reserve() {
         setLoading(true);
         fetch(`${url}/user`, {
             method: 'POST',
             mode: 'cors',
             body: JSON.stringify({
-                action: "borrow",
+                action: "reserve",
                 username: user,
-                isbn: book.isbn,
-                num: 1
+                isbn: book.isbn
             })
         })
             .then(res => res.json())
             .then(
                 obj => {
                     if (obj.state === 0) {
-                        done(`${book.isbn}/${obj.bookid}/${book.position}`);
+                        setAlertinfo({ open: true, message: "Failed to reserve" });
                     } else {
-                        setAlertinfo({ open: true, message: "Can't borrow more book" });
+                        done();
                     }
                     setLoading(false);
                 },
@@ -32,7 +31,7 @@ export default function ReserveConfirm({ book, user, done }: { book: booktype, u
                     setAlertinfo({ open: true, message: "Network error" });
                     setLoading(false);
                 }
-            )
+            );
     }
     return (
         <>
@@ -42,15 +41,15 @@ export default function ReserveConfirm({ book, user, done }: { book: booktype, u
                 servrity="error"
                 message={alertinfo.message}
             />
-            <DialogTitle>Confirm your borrow</DialogTitle>
+            <DialogTitle>Confirm your reserve</DialogTitle>
             <DialogContent>
                 <Typography>Name: {book.name}</Typography>
                 <Typography>ISBN: {book.isbn}</Typography>
                 <Typography>Author: {book.author}</Typography>
             </DialogContent>
             <DialogActions>
-                <Button onClick={() => done("")}>Cancel</Button>
-                <Button onClick={borrow} disabled={loading}>Confirm</Button>
+                <Button onClick={done}>Cancel</Button>
+                <Button disabled={loading} onClick={reserve}>Confirm</Button>
             </DialogActions>
         </>
     )

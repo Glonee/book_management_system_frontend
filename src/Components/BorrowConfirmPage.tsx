@@ -3,7 +3,7 @@ import { useState } from "react";
 import { url } from "../config";
 import Alert from "./Alert";
 import {book as booktype} from '../Pages/Books';
-export default function ReserveConfirm({ book, user, done }: { book: booktype, user: string, done: (id: string) => void }) {
+export default function BorrowConfirm({ book, user, done }: { book: booktype, user: string, done: (id: string) => void }) {
     const [alertinfo, setAlertinfo] = useState({ open: false, message: "" });
     const [loading, setLoading] = useState(false);
     function borrow() {

@@ -1,5 +1,5 @@
 # 图书管理系统前端
-# This project is NO LONGER maintained by me. LEAVE ME ALONE.
+# Maintainer is now elpsycongru.
 ## 运行
 确保已经安装14.0及以上版本的nodejs，然后使用`npm install`安装依赖包，使用`npm start`启动开发服务器。
 ## 开发

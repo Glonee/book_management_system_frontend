@@ -117,7 +117,15 @@ function Books({ mode }: { mode: "user" | "admin" }): JSX.Element {
                 onClose={() => setOpenBorrow(false)}
             >
                 <Suspense fallback={<DialogContent><CircularProgress /></DialogContent>}>
-                    <BorrowConfirm book={select} user={username} done={id => { setBarcodes([id]); updateBooks(); setOpenBorrow(false); }} />
+                    <BorrowConfirm
+                        book={select}
+                        user={username}
+                        done={id => {
+                            setBarcodes([id]);
+                            updateBooks();
+                            setOpenBorrow(false);
+                        }}
+                    />
                 </Suspense>
             </Dialog>
             <Dialog
@@ -125,7 +133,11 @@ function Books({ mode }: { mode: "user" | "admin" }): JSX.Element {
                 onClose={() => setOpenReserve(false)}
             >
                 <Suspense fallback={<DialogContent><CircularProgress /></DialogContent>}>
-                    <ReserveConfirm book={select} user={username} done={() => setOpenReserve(false)} />
+                    <ReserveConfirm
+                        book={select}
+                        user={username}
+                        done={() => setOpenReserve(false)}
+                    />
                 </Suspense>
             </Dialog>
             <Dialog

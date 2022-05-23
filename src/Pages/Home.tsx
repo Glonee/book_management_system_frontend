@@ -1,7 +1,7 @@
-import { Avatar, Box, Button, Card, CardActions, CardContent, Container, Grid, List, ListItemText, Typography } from '@mui/material';
-import { blue } from '@mui/material/colors';
+import { Box, Button, Card, CardActions, CardContent, Container, Grid, List, ListItemText, Typography } from '@mui/material';
 import { useEffect, useMemo, useState } from 'react';
 import Alert from '../Components/Alert';
+import Barcode from '../Components/Barcode';
 import { url } from '../config';
 function Home({ mode }: { mode: "user" | "admin" }): JSX.Element {
     const [open, setOpen] = useState(false);
@@ -10,7 +10,6 @@ function Home({ mode }: { mode: "user" | "admin" }): JSX.Element {
     const [bookavailable, setBookavailable] = useState(0);
     const u = useMemo(() => localStorage.getItem(`${mode}name`), [mode]);
     const username = u === null ? "?" : u;
-    const u1 = username === "" ? "" : username[0];
     const messages = [
         `You have ${overduebooks} over due book.`,
         `${bookavailable} of your reserved book is available.`
@@ -57,7 +56,7 @@ function Home({ mode }: { mode: "user" | "admin" }): JSX.Element {
                 flexDirection: "column",
                 marginTop: 10
             }}>
-                <Avatar sx={{ bgcolor: blue[400], height: 100, width: 100, mb: 3, fontSize: 70 }}>{u1}</Avatar>
+                <Barcode data={username} height={200} width={4} />
                 <Typography variant='h4' component='p' sx={{ mb: 7 }}>Welcome, {username}</Typography>
                 <Grid container spacing={2} mb={3}>
                     <Grid item xs={12}>

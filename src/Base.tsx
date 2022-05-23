@@ -24,7 +24,13 @@ function Base({ pages, mode }: { pages: { name: string, to: string }[], mode: "u
                         sx={{ width: "100%" }}
                     >
                         {pages.map(page => (
-                            <Tab key={page.name} component={Link} to={page.to} value={page.to} label={page.name} />
+                            <Tab
+                                key={page.name}
+                                component={Link}
+                                to={page.to}
+                                value={page.to}
+                                label={page.name}
+                            />
                         ))}
                     </Tabs>
                     <Button

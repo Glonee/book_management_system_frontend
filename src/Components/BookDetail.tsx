@@ -53,7 +53,12 @@ export default function BookDetail({ book, admin, addcartdisabled, deletebook, m
                             >
                                 {
                                     Array.from(Array(+book.num).keys()).map((_, index) => (
-                                        <MenuItem key={index} value={index.toString()}>{index}</MenuItem>
+                                        <MenuItem
+                                            key={index}
+                                            value={index.toString()}
+                                        >
+                                            {index}
+                                        </MenuItem>
                                     ))
                                 }
                             </Select>

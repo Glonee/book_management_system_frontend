@@ -87,7 +87,7 @@ function Books({ mode }: { mode: "user" | "admin" }): JSX.Element {
                 <Fab
                     onClick={() => setOpenCart(true)}
                     color="primary"
-                    sx={{ position: "absolute", right: 50, bottom: 50 }}
+                    sx={{ position: "fixed", right: 50, bottom: 50 }}
                 >
                     <ShoppingCartIcon />
                 </Fab>}

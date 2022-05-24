@@ -93,12 +93,6 @@ function ModBooks({ book, done }: { book: booktype, done: () => void }) {
             />
             <DialogTitle>Modify book</DialogTitle>
             <DialogContent>
-                <Alert
-                    open={alertinfo.open}
-                    onClose={() => setAlertinfo(pre => ({ ...pre, open: false }))}
-                    message={alertinfo.message}
-                    servrity={alertinfo.servrity}
-                />
                 <Box sx={{
                     alignItems: "center",
                     display: "flex",

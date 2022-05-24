@@ -28,7 +28,7 @@ const userpages = [
     { name: "Home", to: homepage },
     { name: "Books", to: `${homepage}/books` },
     { name: "Borrowed", to: `${homepage}/borrow` },
-    { name: "History", to: `${homepage}/history}` },
+    { name: "History", to: `${homepage}/history` },
     { name: "Reserve", to: `${homepage}/reserve` }
 ];
 //管理员的菜单栏

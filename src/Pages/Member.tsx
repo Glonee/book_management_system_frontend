@@ -15,20 +15,18 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import { lazy, Suspense, useEffect, useState } from 'react';
 import Alert from '../Components/Alert';
 import { url } from '../config';
-const Signup = lazy(() => import('../Pages/Signup'));
-export const memberprto = {
-    username : "",
-    password : "",
-    email : "",
-    birth : "",
-    phone : "",
-    gender : ""
+const Signup = lazy(() => import('../Components/Signup'));
+interface person {
+    username: string;
+    password: string;
+    email: string;
+    birth: string;
+    phone: string;
+    gender: string;
 }
-export type person = typeof memberprto;
-function Member({ mode }: { mode: "user" | "admin" }): JSX.Element {
+function Member(): JSX.Element {
     const [members, setMembers] = useState<person[]>([]);
     const [openAddMembers, setOpenAddMembers] = useState(false);
-    const [openDelete, setOpenDelete] = useState(false);
     const [alertinfo, setAlertinfo] = useState<{
         open: boolean,
         message: string,
@@ -36,7 +34,7 @@ function Member({ mode }: { mode: "user" | "admin" }): JSX.Element {
     }>({ open: false, message: "", serivity: 'error' });
     const [loading, setLoading] = useState(false);
     useEffect(updateMembers, []);
-    
+
     function updateMembers() {
         setLoading(true);
         fetch(`${url}/user`, {
@@ -50,26 +48,48 @@ function Member({ mode }: { mode: "user" | "admin" }): JSX.Element {
                 () => {
                     setMembers([
                         {
-                             "username": "123455",
-                             "password": "123123",
-                             "email": "devil@qq.com",
-                             "birth":"2001-04-12",
-                             "phone":"2132142434",
-                             "gender":"男"
+                            "username": "123455",
+                            "password": "123123",
+                            "email": "devil@qq.com",
+                            "birth": "2001-04-12",
+                            "phone": "2132142434",
+                            "gender": "男"
                         },
-                       {
-                             "username": "dsafdasf",
-                             "password": "123123",
-                             "email": "devil@qq.com",
-                             "birth":"2001-04-12",
-                             "phone":"2132142434",
-                             "gender":"男"
-                       }
-                   ]); 
+                        {
+                            "username": "dsafdasf",
+                            "password": "123123",
+                            "email": "devil@qq.com",
+                            "birth": "2001-04-12",
+                            "phone": "2132142434",
+                            "gender": "男"
+                        }
+                    ]);
                     setLoading(false);
                     /*
                     setAlertinfo({ open: true, message: "Network error", serivity: "error" });
                     setLoading(false);*/
+                }
+            )
+    }
+    function deleteUser(username: string) {
+        fetch(`${url}/user`, {
+            method: 'POST',
+            mode: 'cors',
+            body: JSON.stringify({ action: "deleteUser", username: username })
+        })
+            .then(res => res.json())
+            .then(
+                obj => {
+                    if (obj.state === 1) {
+                        updateMembers();
+                    } else {
+                        setAlertinfo({ open: true, message: "Can't delete this user", serivity: "error" });
+                    }
+                    setLoading(false);
+                },
+                () => {
+                    setAlertinfo({ open: true, message: "Network error", serivity: "error" });
+                    setLoading(false);
                 }
             )
     }
@@ -81,30 +101,26 @@ function Member({ mode }: { mode: "user" | "admin" }): JSX.Element {
                 message={alertinfo.message}
                 servrity={alertinfo.serivity}
             />
-            {mode === "admin" &&
-                <>
-                    <Dialog
-                        open={openAddMembers}
-                        onClose={() => setOpenAddMembers(false)}
-                        maxWidth={"md"}
-                        fullWidth = {true}
-                    >
-                        <DialogTitle>Add account</DialogTitle>
-                        <Suspense fallback={<DialogContent><CircularProgress /></DialogContent>}>
-                            <Signup />
-                        </Suspense>
-                    </Dialog>
-                    
-                    <Button
-                        disabled={loading}
-                        variant="contained"
-                        startIcon={<AddIcon />}
-                        onClick={() => setOpenAddMembers(true)}
-                    >
-                        Add user
-                    </Button>
-                </>
-            }
+            <Dialog
+                open={openAddMembers}
+                onClose={() => { setOpenAddMembers(false); updateMembers(); }}
+                maxWidth="sm"
+                fullWidth
+            >
+                <DialogTitle>Add account</DialogTitle>
+                <Suspense fallback={<DialogContent><CircularProgress /></DialogContent>}>
+                    <Signup />
+                </Suspense>
+            </Dialog>
+
+            <Button
+                disabled={loading}
+                variant="contained"
+                startIcon={<AddIcon />}
+                onClick={() => setOpenAddMembers(true)}
+            >
+                Add user
+            </Button>
             <TableContainer sx={{ mb: 3 }}>
                 <Table>
                     <TableHead>
@@ -115,45 +131,33 @@ function Member({ mode }: { mode: "user" | "admin" }): JSX.Element {
                             <TableCell align='right'>Birth</TableCell>
                             <TableCell align='right'>phone</TableCell>
                             <TableCell align='right'>gender</TableCell>
+                            <TableCell align='right'>delete</TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
                         {
-                        members.map(members => (
-                            <TableRow
-                                key={members.username}
-                                hover
-                            >
-                                <TableCell>{members.username}</TableCell>
-                                <TableCell>{members.password}</TableCell>
-                                <TableCell>{members.email}</TableCell>
-                                <TableCell align='right'>{members.birth}</TableCell>
-                                <TableCell align='right'>{members.phone}</TableCell>
-                                <TableCell align='right'>{members.gender}</TableCell>
-                                <IconButton aria-label="delete" size="small"
-                                    onClick = {() => { 
-                                        setOpenDelete(true);
-                                        fetch(`${url}/user`,{
-                                            method: 'POST',
-                                            mode: 'cors',
-                                            body: JSON.stringify({ action : "deleteUser" ,username : members.username })
-                                        })
-                                        .then(res => res.json())
-                                        .then(
-                                                obj => { updateMembers(); setLoading(false); },
-                                                () => {
-                                                    setAlertinfo({ open: true, message: "Network error", serivity: "error" });
-                                                    setLoading(false); 
-                                                    setOpenAddMembers(false);
-                }
-            )
-                                        setOpenDelete(false);
-                                    }}
+                            members.map(member => (
+                                <TableRow
+                                    key={member.username}
+                                    hover
                                 >
-                                    <DeleteIcon fontSize="small" />
-                                </IconButton>
-                            </TableRow>
-                        ))}
+                                    <TableCell>{member.username}</TableCell>
+                                    <TableCell>{member.password}</TableCell>
+                                    <TableCell>{member.email}</TableCell>
+                                    <TableCell align='right'>{member.birth}</TableCell>
+                                    <TableCell align='right'>{member.phone}</TableCell>
+                                    <TableCell align='right'>{member.gender}</TableCell>
+                                    <TableCell align='right'>
+                                        <IconButton
+                                            aria-label="delete"
+                                            size="small"
+                                            onClick={() => deleteUser(member.username)}
+                                        >
+                                            <DeleteIcon fontSize="small" />
+                                        </IconButton>
+                                    </TableCell>
+                                </TableRow>
+                            ))}
                     </TableBody>
                 </Table >
             </TableContainer>

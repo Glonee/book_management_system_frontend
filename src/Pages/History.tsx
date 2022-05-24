@@ -1,7 +1,7 @@
 import { useState, useMemo, useEffect } from "react";
 import { url } from "../config";
 import Alert from "../Components/Alert";
-import { Container, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from "@mui/material";
+import { Container, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField } from "@mui/material";
 function History({ mode }: { mode: "user" | "admin" }) {
     const [books, setBooks] = useState<{
         bookid: string,
@@ -12,6 +12,7 @@ function History({ mode }: { mode: "user" | "admin" }) {
         name: string
     }[]>([]);
     const [openAlert, setOpenAlert] = useState(false);
+    const [searchText, setSearchText] = useState("");
     const u = useMemo(() => localStorage.getItem(`${mode}name`), [mode]);
     const username = u === null ? "" : u;
     const booktoshow = mode === "admin" ? books : books.filter(book => book.username === username);
@@ -37,6 +38,14 @@ function History({ mode }: { mode: "user" | "admin" }) {
                 onClose={() => setOpenAlert(false)}
                 servrity="error"
             />
+            {mode === "admin" && <TextField
+                label="Search by user name"
+                type="text"
+                value={searchText}
+                onChange={e => setSearchText(e.target.value)}
+                margin="normal"
+                fullWidth
+            />}
             <TableContainer>
                 <Table>
                     <TableHead>
@@ -50,7 +59,7 @@ function History({ mode }: { mode: "user" | "admin" }) {
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {booktoshow.map((book, index) => (
+                        {booktoshow.filter(book => book.username.includes(searchText)).map((book, index) => (
                             <TableRow key={index}>
                                 <TableCell>{book.name}</TableCell>
                                 <TableCell>{book.username}</TableCell>

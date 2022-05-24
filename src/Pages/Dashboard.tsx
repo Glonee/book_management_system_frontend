@@ -1,10 +1,9 @@
-import { Avatar, Box, Button, Card, CardActions, CardContent, Container, Grid, List, ListItemText, Typography } from '@mui/material';
-import { blue } from '@mui/material/colors';
+import { Box, Button, Card, CardActions, CardContent, Container, Grid, Typography } from '@mui/material';
 import { useEffect, useMemo, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Alert from '../Components/Alert';
-import { url } from '../config';
-function Dashboardd({ mode }: { mode: "admin" }): JSX.Element {
-    
+import { url, homepage } from '../config';
+function Dashboardd(): JSX.Element {
     const [open, setOpen] = useState(false);
     const [usernum, setUsernum] = useState(0);
     const [bookkind, setBookkind] = useState(0);
@@ -12,107 +11,30 @@ function Dashboardd({ mode }: { mode: "admin" }): JSX.Element {
     const [bookborrowed, setBookborrowed] = useState(0);
     const [finecollected, setFinecollected] = useState(0);
     const [fineunpaid, setFineunpaid] = useState(0);
-    const u = useMemo(() => localStorage.getItem(`${mode}name`), [mode]);
+    const u = useMemo(() => localStorage.getItem("adminname"), []);
+    const navigate = useNavigate();
     const username = u === null ? "?" : u;
-    
-    
-    useEffect(() => {//用户数量
-        fetch(`${url}/user`, {
+    useEffect(() => {
+        const fetches = [
+            { action: "getTotalUsers", field: "totalUsrs", set: setUsernum },
+            { action: "getTotalBooks", field: "totalBooks", set: setBooknum },
+            { action: "getTotalBooksNum", field: "totalBooksNum", set: setBookkind },
+            { action: "getBorrows", field: "borrows", set: setBookborrowed },
+            { action: "getFineCollected", field: "fineCollected", set: setFinecollected },
+            { action: "getFineUnpaid", field: "fineUnpaid", set: setFineunpaid }
+        ]
+        Promise.all(fetches.map(fe => fetch(`${url}/admin`, {
             method: 'POST',
             mode: 'cors',
             body: JSON.stringify({
-                action: "getTotalUsers",
+                action: fe.action,
                 username: username
             })
         })
             .then(res => res.json())
-            .then(
-                obj => { setUsernum(obj.totalUsrs); },
-                () => setOpen(true)
-            );
-    },[usernum]);
-
-
-    useEffect(() => {//图书种类数量
-        fetch(`${url}/user`, {
-            method: 'POST',
-            mode: 'cors',
-            body: JSON.stringify({
-                action: "getTotalBooks",
-                username: username
-            })
-        })
-            .then(res => res.json())
-            .then(
-                obj => { setBooknum(obj.totalBooks); },
-                () => setOpen(true)
-            );
-    },[bookkind]);
-
-    useEffect(() => {//图书数量
-        fetch(`${url}/user`, {
-            method: 'POST',
-            mode: 'cors',
-            body: JSON.stringify({
-                action: "getTotalBooksNum",
-                username: username
-            })
-        })
-            .then(res => res.json())
-            .then(
-                obj => { setBookkind(obj.totalBooksNum); },
-                () => setOpen(true)
-            );
-    },[booknum]);
-
-    useEffect(() => {//借出去的图书数量
-        fetch(`${url}/user`, {
-            method: 'POST',
-            mode: 'cors',
-            body: JSON.stringify({
-                action: "getBorrows",
-                username: username
-            })
-        })
-            .then(res => res.json())
-            .then(
-                obj => { setBookborrowed(obj.borrows); },
-                () => setOpen(true)
-            );
-    },[bookborrowed]);
-
-    useEffect(() => {//已缴纳的罚款金额
-        fetch(`${url}/user`, {
-            method: 'POST',
-            mode: 'cors',
-            body: JSON.stringify({
-                action: "getFineCollected",
-                username: username
-            })
-        })
-            .then(res => res.json())
-            .then(
-                obj => { setFinecollected(obj.fineCollected); },
-                () => setOpen(true)
-            );
-    },[finecollected]);
-
-    useEffect(() => {//未缴纳的罚款金额
-        fetch(`${url}/user`, {
-            method: 'POST',
-            mode: 'cors',
-            body: JSON.stringify({
-                action: "getFineUnpaid",
-                username: username
-            })
-        })
-            .then(res => res.json())
-            .then(
-                obj => { setFineunpaid(obj.fineUnpaid); },
-                () => setOpen(true)
-            );
-    },[fineunpaid]);
-
+            .then(obj => fe.set(obj[fe.field]))
+        )).catch(() => setOpen(true));
+    }, [username]);
     return (
         <Container maxWidth="md" component="main">
             <Alert
@@ -138,20 +60,12 @@ function Dashboardd({ mode }: { mode: "admin" }): JSX.Element {
                                 <Typography variant='h5'>
                                     Members
                                 </Typography>
-                                <List>
-                                    {
-                                    /*messages.map((msg, index) => (
-                                        <ListItemText key={index}>
-                                            {msg}
-                                        </ListItemText>
-                                    ))*/
-                                    usernum}
-                                </List>
+                                <Typography color="text.secondary">
+                                    {usernum}
+                                </Typography>
                             </CardContent>
                             <CardActions>
-                                <Button
-                                    /*onClick={}*/
-                                >
+                                <Button onClick={() => navigate(`${homepage}/admin/member`)}>
                                     learn more
                                 </Button>
                             </CardActions>
@@ -168,7 +82,7 @@ function Dashboardd({ mode }: { mode: "admin" }): JSX.Element {
                                 </Typography>
                             </CardContent>
                             <CardActions>
-                                <Button>Learn More</Button>
+                                <Button onClick={() => navigate(`${homepage}/admin/books`)}>Learn More</Button>
                             </CardActions>
                         </Card>
                     </Grid>
@@ -179,11 +93,11 @@ function Dashboardd({ mode }: { mode: "admin" }): JSX.Element {
                                     Books Number
                                 </Typography>
                                 <Typography color="text.secondary">
-                                    {booknum} 
+                                    {booknum}
                                 </Typography>
                             </CardContent>
                             <CardActions>
-                                <Button>Learn More</Button>
+                                <Button onClick={() => navigate(`${homepage}/admin/books`)}>Learn More</Button>
                             </CardActions>
                         </Card>
                     </Grid>
@@ -194,11 +108,11 @@ function Dashboardd({ mode }: { mode: "admin" }): JSX.Element {
                                     Books Lent
                                 </Typography>
                                 <Typography color="text.secondary">
-                                    {bookborrowed} 
+                                    {bookborrowed}
                                 </Typography>
                             </CardContent>
                             <CardActions>
-                                <Button>Learn More</Button>
+                                <Button onClick={() => navigate(`${homepage}/admin/books`)}>Learn More</Button>
                             </CardActions>
                         </Card>
                     </Grid>
@@ -240,7 +154,7 @@ function Dashboardd({ mode }: { mode: "admin" }): JSX.Element {
 
 
 
-//    ,bookkind,booknum,bookborrowed,finecollected,fineunpaid
+    //    ,bookkind,booknum,bookborrowed,finecollected,fineunpaid
     /*
     const [num, setNum] = useState(0);
     const [overduebooks, setOverduebooks] = useState(0);
@@ -253,35 +167,35 @@ function Dashboardd({ mode }: { mode: "admin" }): JSX.Element {
         `${bookavailable} of your reserved book is available.`
     ];
     */
-   /*
-    useEffect(() => {
-        fetch(`${url}/user`, {
-            method: 'POST',
-            mode: 'cors',
-            body: JSON.stringify({
-                action: "getBorrowingList",
-                username: username
-            })
-        })
-            .then(res => res.json())
-            .then(
-                obj => { setNum(obj.length); setOverduebooks(obj.filter((book: any) => book.fine !== 0).length) },
-                () => setOpen(true)
-            );
-        fetch(`${url}/user`, {
-            method: 'POST',
-            mode: 'cors',
-            body: JSON.stringify({
-                action: "getReserveList",
-                username: username
-            })
-        })
-            .then(res => res.json())
-            .then(
-                obj => setBookavailable(obj.filter((book: any) => book.hasbook).length),
-                () => setOpen(true)
-            )
-    }, [username]);*/
+    /*
+     useEffect(() => {
+         fetch(`${url}/user`, {
+             method: 'POST',
+             mode: 'cors',
+             body: JSON.stringify({
+                 action: "getBorrowingList",
+                 username: username
+             })
+         })
+             .then(res => res.json())
+             .then(
+                 obj => { setNum(obj.length); setOverduebooks(obj.filter((book: any) => book.fine !== 0).length) },
+                 () => setOpen(true)
+             );
+         fetch(`${url}/user`, {
+             method: 'POST',
+             mode: 'cors',
+             body: JSON.stringify({
+                 action: "getReserveList",
+                 username: username
+             })
+         })
+             .then(res => res.json())
+             .then(
+                 obj => setBookavailable(obj.filter((book: any) => book.hasbook).length),
+                 () => setOpen(true)
+             )
+     }, [username]);*/
     /*
     return (
         <Container maxWidth="md" component="main">

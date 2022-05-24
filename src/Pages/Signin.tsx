@@ -1,8 +1,8 @@
 //登录页
-import { Avatar, Box, Button, Container, Link, TextField, Typography } from "@mui/material";
+import { Avatar, Box, Button, Container, /*Link,*/ TextField, Typography } from "@mui/material";
 import { blue } from "@mui/material/colors";
 import { useState } from "react";
-import { Link as RouterLink, useNavigate } from "react-router-dom";
+import { /*Link as RouterLink,*/ useNavigate } from "react-router-dom";
 import Alert from "../Components/Alert";
 import { homepage, url } from '../config';
 function Signin({ mode }: { mode: "user" | "admin" }): JSX.Element {
@@ -90,12 +90,13 @@ function Signin({ mode }: { mode: "user" | "admin" }): JSX.Element {
                     onClick={handleSubbmit}
                 >
                     {loadding ? "LOADDING" : "SIGN IN"}
+                
                 </Button>
-                {mode === "user" &&
+                {/*mode === "user" &&
                     <Link component={RouterLink} to={homepage === "/" ? "/signup" : `${homepage}/signup`}>
                         Don't have a account? Sign up
                     </Link>
-                }
+                */}
             </Box>
         </Container>
     );

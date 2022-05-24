@@ -1,7 +1,7 @@
 //注册页
-import { Box, Button, Container, Dialog, DialogActions, DialogContent, DialogTitle, Link, TextField, Typography } from "@mui/material";
+import { Box, Button, Container, Dialog, DialogActions, DialogContent, DialogTitle, /*Link,*/ TextField/*, Typography*/ } from "@mui/material";
 import { useState } from "react";
-import { Link as RouterLink, useNavigate } from "react-router-dom";
+import { /*Link as RouterLink,*/ useNavigate } from "react-router-dom";
 import Alert from "../Components/Alert";
 import Barcode from "../Components/Barcode";
 import { homepage, url } from '../config';
@@ -74,7 +74,9 @@ function Signup(): JSX.Element {
                 flexDirection: "column",
                 marginTop: 10
             }}>
+                {/* 
                 <Typography component="h1" variant="h5">Sign up</Typography>
+                */}
                 <TextField
                     margin="normal"
                     fullWidth
@@ -125,9 +127,11 @@ function Signup(): JSX.Element {
                 >
                     Sign Up
                 </Button>
+                {/*
                 <Link component={RouterLink} to={homepage === "/" ? "/signin" : `${homepage}/signin`}>
                     Already have a account? Sign in
                 </Link>
+                */}
             </Box>
         </Container>
     );

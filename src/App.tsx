@@ -2,6 +2,7 @@ import '@fontsource/roboto/300.css';
 import '@fontsource/roboto/400.css';
 import '@fontsource/roboto/500.css';
 import '@fontsource/roboto/700.css';
+//import { Dashboard } from '@mui/icons-material';
 import { CssBaseline } from '@mui/material';
 import { lazy } from 'react';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
@@ -18,8 +19,10 @@ const Signup = lazy(() => import('./Pages/Signup'));
 const Home = lazy(() => import('./Pages/Home'));
 const Books = lazy(() => import('./Pages/Books'));
 const Borrow = lazy(() => import('./Pages/Borrow'));
+const Dashboard = lazy(() => import('./Pages/Dashboard'));
 const History = lazy(() => import('./Pages/History'));
 const Reserve = lazy(() => import('./Pages/Reverse'));
+const Member = lazy(() => import('./Pages/Member'));
 //用户的菜单栏
 const userpages = [
     { name: "Home", to: homepage },
@@ -34,7 +37,9 @@ const adminpages = [
     { name: "Books", to: `${homepage}/admin/books` },
     { name: "Borrowed", to: `${homepage}/admin/borrow` },
     { name: "History", to: `${homepage}/admin/history` },
-    { name: "Reserve", to: `${homepage}/admin/reserve` }
+    { name: "Reserve", to: `${homepage}/admin/reserve` },
+    { name: "Dashboard", to: `${homepage}/admin/dashboard`},
+    { name: "Member",to: `${homepage}/admin/member`}
 ]
 function App(): JSX.Element {
     return (
@@ -62,6 +67,8 @@ function App(): JSX.Element {
                                 <Route path="borrow" element={<Sus><Borrow mode="admin" /></Sus>} />
                                 <Route path="history" element={<Sus><History mode="admin" /></Sus>} />
                                 <Route path="reserve" element={<Sus><Reserve mode="admin" /></Sus>} />
+                                <Route path="dashboard" element={<Sus><Dashboard mode="admin" /></Sus>} />
+                                <Route path="member" element={<Sus><Member mode="admin" /></Sus>} />
                             </Route>
                             <Route path="signin" element={<Sus><Signin mode="admin" /></Sus>} />
                         </Route>

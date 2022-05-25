@@ -11,7 +11,7 @@ import {
     TextField,
     Fab
 } from '@mui/material';
-import { lazy, Suspense, useEffect, useMemo, useState } from 'react';
+import { lazy, Suspense, useEffect, useMemo, useState, useRef } from 'react';
 import Alert from '../Components/Alert';
 import Barcode from '../Components/Barcode';
 import BookDetail from '../Components/BookDetail';
@@ -52,7 +52,7 @@ export type book = typeof bookprto;
 export type fetchbook = typeof fetchbookprto;
 function Books({ mode }: { mode: "user" | "admin" }): JSX.Element {
     const [books, setBooks] = useState<fetchbook[]>([]);
-    const [bookid, setBookid] = useState(0);
+    const bookid = useRef(0);
     const [openBorrow, setOpenBorrow] = useState(false);
     const [openAddBooks, setOpenAddBooks] = useState(false);
     const [openDetail, setOpenDetail] = useState(false);
@@ -69,7 +69,7 @@ function Books({ mode }: { mode: "user" | "admin" }): JSX.Element {
         serivity: AlertColor
     }>({ open: false, message: "", serivity: 'error' });
     const [loading, setLoading] = useState(false);
-    const [select, setSelect] = useState(fetchbookprto);
+    const select = useRef(fetchbookprto);
     const [cart, setCart] = useState<(book & { bookid: number })[]>([]);
     const u = useMemo(() => localStorage.getItem(`${mode}name`), [mode]);
     const username = u === null ? "" : u;
@@ -133,8 +133,7 @@ function Books({ mode }: { mode: "user" | "admin" }): JSX.Element {
             >
                 <Suspense fallback={<DialogContent><CircularProgress /></DialogContent>}>
                     <BorrowConfirm
-                        book={{ ...select, bookid: bookid }}
-                        user={username}
+                        book={{ ...select.current, bookid: bookid.current }}
                         done={id => {
                             setBarcodes([id]);
                             updateBooks();
@@ -149,7 +148,7 @@ function Books({ mode }: { mode: "user" | "admin" }): JSX.Element {
             >
                 <Suspense fallback={<DialogContent><CircularProgress /></DialogContent>}>
                     <ReserveConfirm
-                        book={select}
+                        book={select.current}
                         user={username}
                         done={() => setOpenReserve(false)}
                     />
@@ -164,7 +163,6 @@ function Books({ mode }: { mode: "user" | "admin" }): JSX.Element {
                 <Suspense fallback={<DialogContent><CircularProgress /></DialogContent>}>
                     <ShoppingCart
                         books={cart}
-                        user={username}
                         done={ids => { setCart([]); setOpenCart(false); setBarcodes(ids) }}
                         remove={isbn => setCart(books => books.filter(book => book.isbn !== isbn))}
                         loading={loading}
@@ -179,13 +177,13 @@ function Books({ mode }: { mode: "user" | "admin" }): JSX.Element {
                 fullWidth
             >
                 <BookDetail
-                    book={select}
+                    book={select.current}
                     admin={mode === "admin"}
-                    addtocart={id => { setCart(precart => [...precart, { ...select, bookid: id }]); setOpenDetail(false); }}
-                    addcartdisabled={cart.length >= 5 || cart.find(book => book.isbn === select.isbn) !== undefined}
+                    addtocart={id => { setCart(precart => [...precart, { ...select.current, bookid: id }]); setOpenDetail(false); }}
+                    addcartdisabled={cart.length >= 5 || cart.find(book => book.isbn === select.current.isbn) !== undefined}
                     deletebook={() => { setOpenDelete(true); setOpenDetail(false); }}
                     modify={() => { setOpenModify(true); setOpenDetail(false); }}
-                    borrow={id => { setBookid(id); setOpenBorrow(true); setOpenDetail(false); }}
+                    borrow={id => { bookid.current = id; setOpenBorrow(true); setOpenDetail(false); }}
                     reserve={() => { setOpenReserve(true); setOpenDetail(false); }}
                 />
             </Dialog>
@@ -205,7 +203,7 @@ function Books({ mode }: { mode: "user" | "admin" }): JSX.Element {
                     >
                         <Suspense fallback={<DialogContent><CircularProgress /></DialogContent>}>
                             <ModBooks
-                                book={select}
+                                book={select.current}
                                 done={() => { updateBooks(); setOpenModify(false) }} />
                         </Suspense>
                     </Dialog>
@@ -217,7 +215,7 @@ function Books({ mode }: { mode: "user" | "admin" }): JSX.Element {
                     >
                         <Suspense fallback={<DialogContent><CircularProgress /></DialogContent>}>
                             <DeleteBooks
-                                book={select}
+                                book={select.current}
                                 done={() => { updateBooks(); setOpenDelete(false); }}
                             />
                         </Suspense>
@@ -283,7 +281,7 @@ function Books({ mode }: { mode: "user" | "admin" }): JSX.Element {
                             <TableRow
                                 key={book.isbn}
                                 hover
-                                onClick={() => { setSelect(book); setOpenDetail(true); }}
+                                onClick={() => { select.current = book; setOpenDetail(true); }}
                             >
                                 <TableCell>{book.name}</TableCell>
                                 <TableCell>{book.author}</TableCell>

@@ -49,7 +49,7 @@ function App(): JSX.Element {
                     <Route path={homepage}>
                         <Route element={<Base pages={userpages} mode="user" />} >
                             {/*用户可用的页面*/}
-                            <Route index element={<Sus><Home mode="user" /></Sus>} />
+                            <Route index element={<Sus><Home /></Sus>} />
                             <Route path="books" element={<Sus><Books mode="user" /></Sus>} />
                             <Route path="borrow" element={<Sus><Borrow mode="user" /></Sus>} />
                             <Route path="history" element={<Sus><History mode="user" /></Sus>} />

@@ -1,17 +1,17 @@
-import { Button, Dialog, DialogActions, DialogContent, DialogTitle, IconButton, List, ListItem, ListItemText } from "@mui/material";
+import { Button, Dialog, DialogActions, DialogContent, DialogTitle, IconButton, List, ListItem, ListItemText, TextField } from "@mui/material";
 import { useRef, useState } from "react";
 import { url } from "../config";
 import { book as booktype } from '../Pages/Books';
 import DeleteIcon from '@mui/icons-material/Delete';
 type borrowitem = booktype & { bookid: number };
-function ShoppingCart({ user, books, done, remove, loading, setLoading }: {
-    user: string,
+function ShoppingCart({ books, done, remove, loading, setLoading }: {
     books: borrowitem[],
     done: (bookids: string[]) => void,
     remove: (isbn: string) => void,
     loading: boolean,
     setLoading: (loading: boolean) => void
 }): JSX.Element {
+    const [user, setUser] = useState("");
     const [failedbooks, setFailedbooks] = useState<borrowitem[]>([]);
     const barcodes = useRef<string[]>([]);
     function borrowMany() {
@@ -56,6 +56,13 @@ function ShoppingCart({ user, books, done, remove, loading, setLoading }: {
             >
                 <DialogTitle>Can't borrow following books</DialogTitle>
                 <DialogContent>
+                    <TextField
+                        margin="normal"
+                        fullWidth
+                        label="Username"
+                        value={user}
+                        onChange={e => setUser(e.target.value)}
+                    />
                     <List>
                         {failedbooks.map(book => (
                             <ListItem key={book.isbn}>
@@ -98,7 +105,7 @@ function ShoppingCart({ user, books, done, remove, loading, setLoading }: {
                 </List>
             </DialogContent>
             <DialogActions>
-                <Button onClick={borrowMany} disabled={loading}>Check out</Button>
+                <Button onClick={borrowMany} disabled={loading || user === ""}>Check out</Button>
             </DialogActions>
         </>
     )

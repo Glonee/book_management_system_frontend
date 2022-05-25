@@ -3,12 +3,12 @@ import { useEffect, useMemo, useState } from 'react';
 import Alert from '../Components/Alert';
 import Barcode from '../Components/Barcode';
 import { url } from '../config';
-function Home({ mode }: { mode: "user" | "admin" }): JSX.Element {
+function Home(): JSX.Element {
     const [open, setOpen] = useState(false);
     const [num, setNum] = useState(0);
     const [overduebooks, setOverduebooks] = useState(0);
     const [bookavailable, setBookavailable] = useState(0);
-    const u = useMemo(() => localStorage.getItem(`${mode}name`), [mode]);
+    const u = useMemo(() => localStorage.getItem("username"), []);
     const username = u === null ? "?" : u;
     const messages = [
         `You have ${overduebooks} over due book.`,

@@ -1,6 +1,6 @@
 import { Grid, FormControl, InputLabel, Select, MenuItem, List, ListItem, ListItemText, DialogTitle, DialogContent, DialogActions, Button } from "@mui/material";
 import { useEffect, useState } from "react";
-import { book as booktype, bookprto } from "../Pages/Books";
+import { fetchbook as booktype, bookprto } from "../Pages/Books";
 import Barcode from "./Barcode";
 import { isbnapi, apikey } from "../config";
 export default function BookDetail({ book, admin, addcartdisabled, deletebook, modify, addtocart, borrow, reserve }: {
@@ -9,8 +9,8 @@ export default function BookDetail({ book, admin, addcartdisabled, deletebook, m
     addcartdisabled: boolean,
     deletebook: () => void,
     modify: () => void,
-    addtocart: () => void,
-    borrow: () => void,
+    addtocart: (bookid: number) => void,
+    borrow: (bookid: number) => void,
     reserve: () => void
 }) {
     const [bookid, setBookid] = useState("");
@@ -43,7 +43,7 @@ export default function BookDetail({ book, admin, addcartdisabled, deletebook, m
                         <img src={imgsrc} alt={book.name} loading="lazy" referrerPolicy="no-referrer" />
                     </Grid>
                     <Grid item xs={admin ? 8 : 6}>
-                        {admin && <FormControl margin='normal' sx={{ minWidth: 200 }}>
+                        <FormControl margin='normal' sx={{ minWidth: 200 }}>
                             <InputLabel id="labelid">Bookid</InputLabel>
                             <Select
                                 labelId="labelid"
@@ -52,17 +52,17 @@ export default function BookDetail({ book, admin, addcartdisabled, deletebook, m
                                 onChange={e => setBookid(e.target.value)}
                             >
                                 {
-                                    Array.from(Array(+book.num).keys()).map((_, index) => (
+                                    book.availBookid.map(id => (
                                         <MenuItem
-                                            key={index}
-                                            value={index.toString()}
+                                            key={id}
+                                            value={id.toString()}
                                         >
-                                            {index}
+                                            {id}
                                         </MenuItem>
                                     ))
                                 }
                             </Select>
-                        </FormControl>}
+                        </FormControl>
                         <List>
                             {keys.map(key => (
                                 <ListItem>
@@ -85,8 +85,8 @@ export default function BookDetail({ book, admin, addcartdisabled, deletebook, m
                 </>}
                 {book.num !== 0 ?
                     <>
-                        <Button onClick={addtocart} disabled={addcartdisabled}>Add to cart</Button>
-                        <Button onClick={borrow}>Borrow</Button>
+                        <Button onClick={() => addtocart(+bookid)} disabled={addcartdisabled || bookid === ""}>Add to cart</Button>
+                        <Button onClick={() => borrow(+bookid)} disabled={bookid === ""}>Borrow</Button>
                     </> :
                     <Button onClick={reserve}>Reserve</Button>
                 }

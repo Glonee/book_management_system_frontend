@@ -2,8 +2,8 @@ import { Button, DialogActions, DialogContent, DialogTitle, Typography } from "@
 import { useState } from "react";
 import { url } from "../config";
 import Alert from "./Alert";
-import {book as booktype} from '../Pages/Books';
-export default function BorrowConfirm({ book, user, done }: { book: booktype, user: string, done: (id: string) => void }) {
+import { book as booktype } from '../Pages/Books';
+export default function BorrowConfirm({ book, user, done }: { book: booktype & { bookid: number }, user: string, done: (id: string) => void }) {
     const [alertinfo, setAlertinfo] = useState({ open: false, message: "" });
     const [loading, setLoading] = useState(false);
     function borrow() {
@@ -15,6 +15,7 @@ export default function BorrowConfirm({ book, user, done }: { book: booktype, us
                 action: "borrow",
                 username: user,
                 isbn: book.isbn,
+                bookid: book.bookid,
                 num: 1
             })
         })
@@ -22,7 +23,7 @@ export default function BorrowConfirm({ book, user, done }: { book: booktype, us
             .then(
                 obj => {
                     if (obj.state === 0) {
-                        done(`${book.isbn}/${obj.bookid}/${book.position}`);
+                        done(`${book.isbn}/${book.bookid}/${book.position}`);
                     } else {
                         setAlertinfo({ open: true, message: "Can't borrow more book" });
                     }
@@ -46,6 +47,7 @@ export default function BorrowConfirm({ book, user, done }: { book: booktype, us
             <DialogContent>
                 <Typography>Name: {book.name}</Typography>
                 <Typography>ISBN: {book.isbn}</Typography>
+                <Typography>Bookid: {book.bookid}</Typography>
                 <Typography>Author: {book.author}</Typography>
             </DialogContent>
             <DialogActions>

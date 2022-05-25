@@ -35,9 +35,24 @@ export const bookprto = {
     position: "",
     publish_date: ""
 };
+export const fetchbookprto = {
+    name: "",
+    author: "",
+    isbn: "",
+    publish: "",
+    bclass: "",
+    num: 0,
+    price: 0,
+    sum: 0,
+    position: "",
+    publish_date: "",
+    availBookid: [0]
+};
 export type book = typeof bookprto;
+export type fetchbook = typeof fetchbookprto;
 function Books({ mode }: { mode: "user" | "admin" }): JSX.Element {
-    const [books, setBooks] = useState<book[]>([]);
+    const [books, setBooks] = useState<fetchbook[]>([]);
+    const [bookid, setBookid] = useState(0);
     const [openBorrow, setOpenBorrow] = useState(false);
     const [openAddBooks, setOpenAddBooks] = useState(false);
     const [openDetail, setOpenDetail] = useState(false);
@@ -54,8 +69,8 @@ function Books({ mode }: { mode: "user" | "admin" }): JSX.Element {
         serivity: AlertColor
     }>({ open: false, message: "", serivity: 'error' });
     const [loading, setLoading] = useState(false);
-    const [select, setSelect] = useState(bookprto);
-    const [cart, setCart] = useState<book[]>([]);
+    const [select, setSelect] = useState(fetchbookprto);
+    const [cart, setCart] = useState<(book & { bookid: number })[]>([]);
     const u = useMemo(() => localStorage.getItem(`${mode}name`), [mode]);
     const username = u === null ? "" : u;
     const keys = Object.keys(bookprto) as (keyof book)[];
@@ -118,7 +133,7 @@ function Books({ mode }: { mode: "user" | "admin" }): JSX.Element {
             >
                 <Suspense fallback={<DialogContent><CircularProgress /></DialogContent>}>
                     <BorrowConfirm
-                        book={select}
+                        book={{ ...select, bookid: bookid }}
                         user={username}
                         done={id => {
                             setBarcodes([id]);
@@ -166,11 +181,11 @@ function Books({ mode }: { mode: "user" | "admin" }): JSX.Element {
                 <BookDetail
                     book={select}
                     admin={mode === "admin"}
-                    addtocart={() => { setCart(precart => [...precart, select]); setOpenDetail(false); }}
+                    addtocart={id => { setCart(precart => [...precart, { ...select, bookid: id }]); setOpenDetail(false); }}
                     addcartdisabled={cart.length >= 5 || cart.find(book => book.isbn === select.isbn) !== undefined}
                     deletebook={() => { setOpenDelete(true); setOpenDetail(false); }}
                     modify={() => { setOpenModify(true); setOpenDetail(false); }}
-                    borrow={() => { setOpenBorrow(true); setOpenDetail(false); }}
+                    borrow={id => { setBookid(id); setOpenBorrow(true); setOpenDetail(false); }}
                     reserve={() => { setOpenReserve(true); setOpenDetail(false); }}
                 />
             </Dialog>

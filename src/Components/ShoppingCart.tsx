@@ -3,15 +3,16 @@ import { useRef, useState } from "react";
 import { url } from "../config";
 import { book as booktype } from '../Pages/Books';
 import DeleteIcon from '@mui/icons-material/Delete';
+type borrowitem = booktype & { bookid: number };
 function ShoppingCart({ user, books, done, remove, loading, setLoading }: {
     user: string,
-    books: booktype[],
+    books: borrowitem[],
     done: (bookids: string[]) => void,
     remove: (isbn: string) => void,
     loading: boolean,
     setLoading: (loading: boolean) => void
 }): JSX.Element {
-    const [failedbooks, setFailedbooks] = useState<booktype[]>([]);
+    const [failedbooks, setFailedbooks] = useState<borrowitem[]>([]);
     const barcodes = useRef<string[]>([]);
     function borrowMany() {
         setLoading(true);
@@ -22,6 +23,7 @@ function ShoppingCart({ user, books, done, remove, loading, setLoading }: {
                 action: "borrow",
                 username: user,
                 isbn: book.isbn,
+                bookid: book.bookid,
                 num: 1
             })
         })
@@ -29,14 +31,14 @@ function ShoppingCart({ user, books, done, remove, loading, setLoading }: {
             .then(
                 obj => {
                     if (obj.state === 0) {
-                        return { ok: true, book: book, bookid: obj.bookid as string }
+                        return { ok: true, book: book }
                     } else {
-                        return { ok: false, book: book, bookid: "" }
+                        return { ok: false, book: book }
                     }
                 },
-                () => ({ ok: false, book: book, bookid: "" })
+                () => ({ ok: false, book: book })
             ))).then(values => {
-                const successed = values.filter(value => value.ok).map(value => `${value.book.isbn}/${value.bookid}/${value.book.position}`);
+                const successed = values.filter(value => value.ok).map(value => `${value.book.isbn}/${value.book.bookid}/${value.book.position}`);
                 if (successed.length === books.length) {
                     done(successed);
                 } else {
@@ -59,7 +61,7 @@ function ShoppingCart({ user, books, done, remove, loading, setLoading }: {
                             <ListItem key={book.isbn}>
                                 <ListItemText
                                     primary={book.name}
-                                    secondary={`isbn: ${book.isbn}`}
+                                    secondary={`isbn: ${book.isbn}, bookid: ${book.bookid}`}
                                 />
                             </ListItem>
                         ))}
@@ -89,7 +91,7 @@ function ShoppingCart({ user, books, done, remove, loading, setLoading }: {
                         >
                             <ListItemText
                                 primary={book.name}
-                                secondary={`isbn: ${book.isbn}`}
+                                secondary={`isbn: ${book.isbn}, bookid: ${book.bookid}`}
                             />
                         </ListItem>
                     ))}

@@ -101,6 +101,52 @@ function Borrow({ mode }: { mode: "user" | "admin" }) {
                 () => setAlertinfo({ open: true, message: "Network error" })
             )
     }
+    function ReportDamaged(username: string, isbn: string, bookid: string) {
+        fetch(`${url}/admin`, {
+            method: 'POST',
+            mode: 'cors',
+            body: JSON.stringify({
+                action: "addDamage",
+                username: username,
+                isbn: isbn,
+                bookid: bookid
+            })
+        })
+            .then(res => res.json())
+            .then(
+                obj => {
+                    if (obj.state === 0) {
+                        setAlertinfo({ open: true, message: "Can't report damage" });
+                    } else {
+                        update();
+                    }
+                },
+                () => setAlertinfo({ open: true, message: "Network error" })
+            )
+    }
+    function ReportLost(username: string, isbn: string, bookid: string) {
+        fetch(`${url}/admin`, {
+            method: 'POST',
+            mode: 'cors',
+            body: JSON.stringify({
+                action: "addLost",
+                username: username,
+                isbn: isbn,
+                bookid: bookid
+            })
+        })
+            .then(res => res.json())
+            .then(
+                obj => {
+                    if (obj.state === 0) {
+                        setAlertinfo({ open: true, message: "Can't report lost" });
+                    } else {
+                        update();
+                    }
+                },
+                () => setAlertinfo({ open: true, message: "Network error" })
+            )
+    }
     return (
         <Container component="main" maxWidth="lg">
             <Alert
@@ -171,8 +217,10 @@ function Borrow({ mode }: { mode: "user" | "admin" }) {
                             <TableCell>Borrow date</TableCell>
                             <TableCell>Deadline</TableCell>
                             {mode === "admin" && <TableCell>Username</TableCell>}
-                            <TableCell align='right'>Fine</TableCell>
+                            <TableCell align="right">Fine</TableCell>
                             <TableCell align="right">Remaining days</TableCell>
+                            <TableCell align="right">Report damagemed</TableCell>
+                            <TableCell align="right">Report Lost</TableCell>
                             <TableCell align="right">Renew</TableCell>
                             {mode === "admin" && <TableCell>Return</TableCell>}
                         </TableRow>
@@ -194,6 +242,16 @@ function Borrow({ mode }: { mode: "user" | "admin" }) {
                                         (remainings[index] / 1000 / 60 / 60 / 24).toFixed(0)
                                         : "Over due"
                                 }
+                                </TableCell>
+                                <TableCell align='right'>
+                                    <Button onClick={() => ReportDamaged(book.username, book.isbn, book.bookid)}>
+                                        Damaged
+                                    </Button>
+                                </TableCell>
+                                <TableCell align='right'>
+                                    <Button onClick={() => ReportLost(book.username, book.isbn, book.bookid)}>
+                                        Lost
+                                    </Button>
                                 </TableCell>
                                 <TableCell align='right'>
                                     <Button

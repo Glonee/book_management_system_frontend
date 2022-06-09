@@ -6,6 +6,7 @@ import Barcode from '../Components/Barcode';
 import { homepage, url } from '../config';
 function Home(): JSX.Element {
     const [newpwd, setNewpwd] = useState("");
+    const [newemail, setNewemail] = useState("");
     const [openDialog, setOpenDialog] = useState(false);
     const [borrowed, setBorrowed] = useState<{
         bookid: string,
@@ -60,19 +61,23 @@ function Home(): JSX.Element {
                 body: JSON.stringify({ action: "getUsers" })
             })
                 .then(res => res.json())
-                .then(obj => { userinfo.current = obj.filter((usr: any) => usr.username === username) })
+                .then(obj => {
+                    userinfo.current = obj.filter((usr: any) => usr.username === username)[0];
+                    setNewemail(userinfo.current.email);
+                })
         ]).catch(() => setErr(true));
     }, [username])
     function ChangePassword() {
-        fetch(`${url}/admin`, {
+        fetch(`${url}/user`, {
             mode: 'cors',
             method: 'POST',
             body: JSON.stringify({
                 ...userinfo.current,
                 action: "modify",
+                email: newemail,
                 password: newpwd
             })
-        }).catch(() => setErr(true));
+        }).then(() => setOpenDialog(false), () => setErr(true));
     }
     return (
         <Container maxWidth="md" component="main">
@@ -89,9 +94,17 @@ function Home(): JSX.Element {
                 fullWidth
             >
                 <DialogTitle>
-                    Change Password
+                    Modify
                 </DialogTitle>
                 <DialogContent>
+                    <TextField
+                        margin='normal'
+                        fullWidth
+                        label="New Email"
+                        type="email"
+                        value={newemail}
+                        onChange={e => setNewemail(e.target.value)}
+                    />
                     <TextField
                         margin='normal'
                         fullWidth
@@ -126,7 +139,7 @@ function Home(): JSX.Element {
                             </CardContent>
                             <CardActions>
                                 <Button onClick={() => setOpenDialog(true)}>
-                                    Change Password
+                                    Modify
                                 </Button>
                             </CardActions>
                         </Card>

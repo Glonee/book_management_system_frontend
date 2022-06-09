@@ -18,26 +18,25 @@ function Dashboardd(): JSX.Element {
     const username = u === null ? "?" : u;
     useEffect(() => {
         const fetches = [
-            { action: "getTotalUsers", field: "totalUsrs", set: setUsernum },
+            { action: "getTotalUsers", field: "totalUsers", set: setUsernum },
             { action: "getTotalBooks", field: "totalBooks", set: setBooknum },
             { action: "getTotalBooksNum", field: "totalBooksNum", set: setBookkind },
             { action: "getBorrows", field: "borrows", set: setBookborrowed },
             { action: "getFineCollected", field: "fineCollected", set: setFinecollected },
             { action: "getFineUnpaid", field: "fineUnpaid", set: setFineunpaid },
             { action: "getLost", field: "lost", set: setLost },
-            { action: "getDamageList", field: "damageList", set: setDamaged }
+            { action: "getDamage", field: "damage", set: setDamaged }
         ]
         Promise.all(fetches.map(fe => fetch(`${url}/admin`, {
             method: 'POST',
             mode: 'cors',
             body: JSON.stringify({
                 action: fe.action,
-                username: username
             })
         })
             .then(res => res.json())
             .then(obj => fe.set(obj[fe.field]))
-        )).catch(() => setOpen(true));
+        )).catch(err => console.log(err));
     }, [username]);
     return (
         <Container maxWidth="md" component="main">
@@ -53,10 +52,6 @@ function Dashboardd(): JSX.Element {
                 flexDirection: "column",
                 marginTop: 10
             }}>
-                {/*
-                <Avatar sx={{ bgcolor: blue[400], height: 100, width: 100, mb: 3, fontSize: 70 }}>{usernum}</Avatar>
-                <Typography variant='h4' component='p' sx={{ mb: 7 }}>Welcome, {username}</Typography>
-                */}
                 <Grid container spacing={2} mb={3}>
                     <Grid item xs={12}>
                         <Card>

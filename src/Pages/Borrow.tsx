@@ -118,7 +118,7 @@ function Borrow({ mode }: { mode: "user" | "admin" }) {
                     if (obj.state === 0) {
                         setAlertinfo({ open: true, message: "Can't report damage" });
                     } else {
-                        update();
+                        updateBowered(localStorage.getItem("username") as string);
                     }
                 },
                 () => setAlertinfo({ open: true, message: "Network error" })
@@ -141,7 +141,7 @@ function Borrow({ mode }: { mode: "user" | "admin" }) {
                     if (obj.state === 0) {
                         setAlertinfo({ open: true, message: "Can't report lost" });
                     } else {
-                        update();
+                        updateBowered(localStorage.getItem("username") as string);
                     }
                 },
                 () => setAlertinfo({ open: true, message: "Network error" })

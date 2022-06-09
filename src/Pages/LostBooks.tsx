@@ -17,7 +17,7 @@ function LostBook() {
         fetch(`${url}/admin`, {
             mode: 'cors',
             method: 'POST',
-            body: JSON.stringify({ action: "getDamageList" })
+            body: JSON.stringify({ action: "getLostList" })
         })
             .then(res => res.json())
             .then(obj => setLostBooks(obj), () => setErr(true))

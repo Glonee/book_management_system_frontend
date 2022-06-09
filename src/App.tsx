@@ -22,6 +22,8 @@ const Dashboard = lazy(() => import('./Pages/Dashboard'));
 const History = lazy(() => import('./Pages/History'));
 const Reserve = lazy(() => import('./Pages/Reverse'));
 const Member = lazy(() => import('./Pages/Member'));
+const DamagedBook = lazy(() => import('./Pages/DamagedBook'));
+const LostBook = lazy(() => import('./Pages/LostBooks'));
 //用户的菜单栏
 const userpages = [
     { name: "Home", to: homepage },
@@ -37,7 +39,9 @@ const adminpages = [
     { name: "Borrowed", to: `${homepage}/admin/borrow` },
     { name: "History", to: `${homepage}/admin/history` },
     { name: "Reserve", to: `${homepage}/admin/reserve` },
-    { name: "Member", to: `${homepage}/admin/member` }
+    { name: "Member", to: `${homepage}/admin/member` },
+    { name: "Lost Books", to: `${homepage}/admin/lostbooks` },
+    { name: "Damaged Books", to: `${homepage}/admin/damagedbooks` }
 ]
 function App(): JSX.Element {
     return (
@@ -65,6 +69,8 @@ function App(): JSX.Element {
                                 <Route path="history" element={<Sus><History mode="admin" /></Sus>} />
                                 <Route path="reserve" element={<Sus><Reserve mode="admin" /></Sus>} />
                                 <Route path="member" element={<Sus><Member /></Sus>} />
+                                <Route path="damagedbooks" element={<Sus><DamagedBook /></Sus>} />
+                                <Route path="lostbooks" element={<Sus><LostBook /></Sus>} />
                             </Route>
                             <Route path="signin" element={<Sus><Signin mode="admin" /></Sus>} />
                         </Route>

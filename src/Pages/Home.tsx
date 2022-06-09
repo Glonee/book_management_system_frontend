@@ -1,55 +1,110 @@
-import { Box, Button, Card, CardActions, CardContent, Container, Grid, List, ListItemText, Typography } from '@mui/material';
-import { useEffect, useMemo, useState } from 'react';
+import { Box, Button, Card, CardActions, CardContent, Container, Dialog, DialogActions, DialogContent, DialogTitle, Grid, TextField, Typography } from '@mui/material';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Alert from '../Components/Alert';
 import Barcode from '../Components/Barcode';
-import { url } from '../config';
+import { homepage, url } from '../config';
 function Home(): JSX.Element {
-    const [open, setOpen] = useState(false);
-    const [num, setNum] = useState(0);
-    const [overduebooks, setOverduebooks] = useState(0);
-    const [bookavailable, setBookavailable] = useState(0);
+    const [newpwd, setNewpwd] = useState("");
+    const [openDialog, setOpenDialog] = useState(false);
+    const [borrowed, setBorrowed] = useState<{
+        bookid: string,
+        borrow_date: string,
+        deadline: string,
+        fine: number,
+        isbn: string,
+        name: string,
+        time: number
+    }[]>([])
+    const [reserve, setReserve] = useState<{
+        name: string,
+        isbn: string,
+        username: string,
+        reserve_time: string,
+        hasbook: boolean
+    }[]>([]);
+    const [err, setErr] = useState(false);
+    const userinfo = useRef({
+        birth: "",
+        email: "",
+        gender: "",
+        password: "",
+        phone: "",
+        username: ""
+    })
+    const navigate = useNavigate();
     const u = useMemo(() => localStorage.getItem("username"), []);
     const username = u === null ? "?" : u;
-    const messages = [
-        `You have ${overduebooks} over due book.`,
-        `${bookavailable} of your reserved book is available.`
-    ];
     useEffect(() => {
-        fetch(`${url}/user`, {
-            method: 'POST',
-            mode: 'cors',
-            body: JSON.stringify({
-                action: "getBorrowingList",
-                username: username
+        const actions: [string, (obj: any) => void][] = [
+            ["getBorrowingList", setBorrowed],
+            ["getReserveList", setReserve]
+        ]
+        Promise.all([
+            ...actions.map(action => {
+                const [ac, set] = action;
+                return fetch(`${url}/user`, {
+                    mode: 'cors',
+                    method: 'POST',
+                    body: JSON.stringify({
+                        action: ac,
+                        username: username
+                    })
+                })
+                    .then(res => res.json())
+                    .then(obj => set(obj));
+            }),
+            fetch(`${url}/admin`, {
+                mode: 'cors',
+                method: 'POST',
+                body: JSON.stringify({ action: "getUsers" })
             })
-        })
-            .then(res => res.json())
-            .then(
-                obj => { setNum(obj.length); setOverduebooks(obj.filter((book: any) => book.fine !== 0).length) },
-                () => setOpen(true)
-            );
-        fetch(`${url}/user`, {
-            method: 'POST',
+                .then(res => res.json())
+                .then(obj => { userinfo.current = obj.filter((usr: any) => usr.username === username) })
+        ]).catch(() => setErr(true));
+    }, [username])
+    function ChangePassword() {
+        fetch(`${url}/admin`, {
             mode: 'cors',
+            method: 'POST',
             body: JSON.stringify({
-                action: "getReserveList",
-                username: username
+                ...userinfo.current,
+                action: "modify",
+                password: newpwd
             })
-        })
-            .then(res => res.json())
-            .then(
-                obj => setBookavailable(obj.filter((book: any) => book.hasbook).length),
-                () => setOpen(true)
-            )
-    }, [username]);
+        }).catch(() => setErr(true));
+    }
     return (
         <Container maxWidth="md" component="main">
             <Alert
                 message='Network error'
-                open={open}
-                onClose={() => setOpen(false)}
+                open={err}
+                onClose={() => setErr(false)}
                 servrity='error'
             />
+            <Dialog
+                open={openDialog}
+                onClose={() => setOpenDialog(false)}
+                maxWidth="xs"
+                fullWidth
+            >
+                <DialogTitle>
+                    Change Password
+                </DialogTitle>
+                <DialogContent>
+                    <TextField
+                        margin='normal'
+                        fullWidth
+                        label="New assword"
+                        type="password"
+                        value={newpwd}
+                        onChange={e => setNewpwd(e.target.value)}
+                    />
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={ChangePassword}>Subbmit</Button>
+                </DialogActions>
+            </Dialog>
             <Box sx={{
                 alignItems: "center",
                 display: "flex",
@@ -63,48 +118,92 @@ function Home(): JSX.Element {
                         <Card>
                             <CardContent>
                                 <Typography variant='h5'>
-                                    Inbox
+                                    User Information
                                 </Typography>
-                                <List>
-                                    {messages.map((msg, index) => (
-                                        <ListItemText key={index}>
-                                            {msg}
-                                        </ListItemText>
-                                    ))}
-                                </List>
+                                <Typography color="text.secondary">
+                                    username: {username}
+                                </Typography>
                             </CardContent>
                             <CardActions>
-                                <Button>Clear</Button>
+                                <Button onClick={() => setOpenDialog(true)}>
+                                    Change Password
+                                </Button>
                             </CardActions>
                         </Card>
                     </Grid>
-                    <Grid item xs={12} md={6}>
+                    <Grid item xs={6}>
                         <Card>
                             <CardContent>
                                 <Typography variant='h5'>
-                                    Basic information
+                                    Current Borrowed Books
                                 </Typography>
                                 <Typography color="text.secondary">
-                                    User: {username}
+                                    {borrowed.length}
                                 </Typography>
                             </CardContent>
                             <CardActions>
-                                <Button>Learn More</Button>
+                                <Button onClick={() => navigate(`${homepage}/borrow`)}>
+                                    Learn More
+                                </Button>
                             </CardActions>
                         </Card>
                     </Grid>
-                    <Grid item xs={12} md={6}>
+                    <Grid item xs={6}>
                         <Card>
                             <CardContent>
                                 <Typography variant='h5'>
-                                    Borrowed books
+                                    Last Return Books
                                 </Typography>
                                 <Typography color="text.secondary">
-                                    You have borrowed {num} book(s)
+                                    {borrowed.length === 0 ?
+                                        "None" :
+                                        borrowed.reduce((book, item) => {
+                                            if (item.time < book.time) {
+                                                return item
+                                            }
+                                            return book;
+                                        }).name
+                                    }
                                 </Typography>
                             </CardContent>
                             <CardActions>
-                                <Button>Learn More</Button>
+                                <Button onClick={() => navigate(`${homepage}/borrow`)}>
+                                    Learn More
+                                </Button>
+                            </CardActions>
+                        </Card>
+                    </Grid>
+                    <Grid item xs={6}>
+                        <Card>
+                            <CardContent>
+                                <Typography variant='h5'>
+                                    Total Fine Amount
+                                </Typography>
+                                <Typography color="text.secondary">
+                                    {borrowed.reduce((presum, book) => presum + book.fine, 0)}
+                                </Typography>
+                            </CardContent>
+                            <CardActions>
+                                <Button onClick={() => navigate(`${homepage}/borrow`)}>
+                                    Learn More
+                                </Button>
+                            </CardActions>
+                        </Card>
+                    </Grid>
+                    <Grid item xs={6}>
+                        <Card>
+                            <CardContent>
+                                <Typography variant='h5'>
+                                    Reserve Status
+                                </Typography>
+                                <Typography color="text.secondary">
+                                    {reserve.filter(item => item.hasbook).length} of your reserved books is available.
+                                </Typography>
+                            </CardContent>
+                            <CardActions>
+                                <Button onClick={() => navigate(`${homepage}/reserve`)}>
+                                    Learn More
+                                </Button>
                             </CardActions>
                         </Card>
                     </Grid>

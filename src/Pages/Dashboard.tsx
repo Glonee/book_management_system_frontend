@@ -11,6 +11,8 @@ function Dashboardd(): JSX.Element {
     const [bookborrowed, setBookborrowed] = useState(0);
     const [finecollected, setFinecollected] = useState(0);
     const [fineunpaid, setFineunpaid] = useState(0);
+    const [lost, setLost] = useState(0);
+    const [damaged, setDamaged] = useState(0);
     const u = useMemo(() => localStorage.getItem("adminname"), []);
     const navigate = useNavigate();
     const username = u === null ? "?" : u;
@@ -21,7 +23,9 @@ function Dashboardd(): JSX.Element {
             { action: "getTotalBooksNum", field: "totalBooksNum", set: setBookkind },
             { action: "getBorrows", field: "borrows", set: setBookborrowed },
             { action: "getFineCollected", field: "fineCollected", set: setFinecollected },
-            { action: "getFineUnpaid", field: "fineUnpaid", set: setFineunpaid }
+            { action: "getFineUnpaid", field: "fineUnpaid", set: setFineunpaid },
+            { action: "getLost", field: "lost", set: setLost },
+            { action: "getDamageList", field: "damageList", set: setDamaged }
         ]
         Promise.all(fetches.map(fe => fetch(`${url}/admin`, {
             method: 'POST',
@@ -146,90 +150,18 @@ function Dashboardd(): JSX.Element {
                             </CardActions>
                         </Card>
                     </Grid>
-                </Grid>
-            </Box>
-        </Container>
-    )
-
-
-
-
-    //    ,bookkind,booknum,bookborrowed,finecollected,fineunpaid
-    /*
-    const [num, setNum] = useState(0);
-    const [overduebooks, setOverduebooks] = useState(0);
-    const [bookavailable, setBookavailable] = useState(0);
-    const u = useMemo(() => localStorage.getItem(`${mode}name`), [mode]);
-    const username = u === null ? "?" : u;
-    const u1 = username === "" ? "" : username[0];
-    const messages = [
-        `You have ${overduebooks} over due book.`,
-        `${bookavailable} of your reserved book is available.`
-    ];
-    */
-    /*
-     useEffect(() => {
-         fetch(`${url}/user`, {
-             method: 'POST',
-             mode: 'cors',
-             body: JSON.stringify({
-                 action: "getBorrowingList",
-                 username: username
-             })
-         })
-             .then(res => res.json())
-             .then(
-                 obj => { setNum(obj.length); setOverduebooks(obj.filter((book: any) => book.fine !== 0).length) },
-                 () => setOpen(true)
-             );
-         fetch(`${url}/user`, {
-             method: 'POST',
-             mode: 'cors',
-             body: JSON.stringify({
-                 action: "getReserveList",
-                 username: username
-             })
-         })
-             .then(res => res.json())
-             .then(
-                 obj => setBookavailable(obj.filter((book: any) => book.hasbook).length),
-                 () => setOpen(true)
-             )
-     }, [username]);*/
-    /*
-    return (
-        <Container maxWidth="md" component="main">
-            <Alert
-                message='Network error'
-                open={open}
-                onClose={() => setOpen(false)}
-                servrity='error'
-            />
-            <Box sx={{
-                alignItems: "center",
-                display: "flex",
-                flexDirection: "column",
-                marginTop: 10
-            }}>
-                <Avatar sx={{ bgcolor: blue[400], height: 100, width: 100, mb: 3, fontSize: 70 }}>{u1}</Avatar>
-                <Typography variant='h4' component='p' sx={{ mb: 7 }}>Welcome, {username}</Typography>
-                <Grid container spacing={2} mb={3}>
-                    <Grid item xs={12}>
+                    <Grid item xs={12} md={6}>
                         <Card>
                             <CardContent>
                                 <Typography variant='h5'>
-                                    Inbox
+                                    Lost book
                                 </Typography>
-                                <List>
-                                    {messages.map((msg, index) => (
-                                        <ListItemText key={index}>
-                                            {msg}
-                                        </ListItemText>
-                                    ))}
-                                </List>
+                                <Typography color="text.secondary">
+                                    {lost}
+                                </Typography>
                             </CardContent>
                             <CardActions>
-                                <Button>Clear</Button>
+                                <Button onClick={() => navigate(`${homepage}/admin/lostbooks`)}>Learn More</Button>
                             </CardActions>
                         </Card>
                     </Grid>
@@ -237,35 +169,20 @@ function Dashboardd(): JSX.Element {
                         <Card>
                             <CardContent>
                                 <Typography variant='h5'>
-                                    Basic information
+                                    Damaged book
                                 </Typography>
                                 <Typography color="text.secondary">
-                                    User: {username}
+                                    {damaged}
                                 </Typography>
                             </CardContent>
                             <CardActions>
-                                <Button>Learn More</Button>
-                            </CardActions>
-                        </Card>
-                    </Grid>
-                    <Grid item xs={12} md={6}>
-                        <Card>
-                            <CardContent>
-                                <Typography variant='h5'>
-                                    Borrowed books
-                                </Typography>
-                                <Typography color="text.secondary">
-                                    You have borrowed {num} book(s)
-                                </Typography>
-                            </CardContent>
-                            <CardActions>
-                                <Button>Learn More</Button>
+                                <Button onClick={() => navigate(`${homepage}/admin/damagedbooks`)}>Learn More</Button>
                             </CardActions>
                         </Card>
                     </Grid>
                 </Grid>
             </Box>
         </Container>
-    )*/
+    )
 }
 export default Dashboardd;

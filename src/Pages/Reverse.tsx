@@ -34,7 +34,7 @@ function Reverse({ mode }: { mode: "user" | "admin" }) {
             method: 'POST',
             mode: 'cors',
             body: JSON.stringify({
-                action: "getReverseList",
+                action: "getReserveList",
                 username: username
             })
         })

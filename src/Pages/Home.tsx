@@ -33,6 +33,7 @@ function Home(): JSX.Element {
         phone: "",
         username: ""
     })
+    type info = typeof userinfo.current;
     const navigate = useNavigate();
     const u = useMemo(() => localStorage.getItem("username"), []);
     const username = u === null ? "?" : u;
@@ -61,9 +62,12 @@ function Home(): JSX.Element {
                 body: JSON.stringify({ action: "getUsers" })
             })
                 .then(res => res.json())
-                .then(obj => {
-                    userinfo.current = obj.filter((usr: any) => usr.username === username)[0];
-                    setNewemail(userinfo.current.email);
+                .then((obj: info[]) => {
+                    const thisuser = obj.find(usr => usr.username === username)
+                    if (thisuser !== undefined) {
+                        userinfo.current = thisuser;
+                        setNewemail(thisuser.email);
+                    }
                 })
         ]).catch(() => setErr(true));
     }, [username])

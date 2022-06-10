@@ -244,12 +244,28 @@ function Borrow({ mode }: { mode: "user" | "admin" }) {
                                 }
                                 </TableCell>
                                 <TableCell align='right'>
-                                    <Button onClick={() => ReportDamaged(book.username, book.isbn, book.bookid)}>
+                                    <Button onClick={() => {
+                                        const payurl = new URL(`${url}/index1.jsp`);
+                                        payurl.searchParams.set("bookid", `"${book.bookid}"`);
+                                        payurl.searchParams.set("isbn", `"${book.isbn}"`);
+                                        payurl.searchParams.set("payFine", "\"100\"");
+                                        payurl.searchParams.set("name", `"${book.name}"`);
+                                        window.open(payurl.href);
+                                        ReportDamaged(book.username, book.isbn, book.bookid);
+                                    }}>
                                         Damaged
                                     </Button>
                                 </TableCell>
                                 <TableCell align='right'>
-                                    <Button onClick={() => ReportLost(book.username, book.isbn, book.bookid)}>
+                                    <Button onClick={() => {
+                                        const payurl = new URL(`${url}/index1.jsp`);
+                                        payurl.searchParams.set("bookid", `"${book.bookid}"`);
+                                        payurl.searchParams.set("isbn", `"${book.isbn}"`);
+                                        payurl.searchParams.set("payFine", "100");
+                                        payurl.searchParams.set("name", `"${book.name}"`);
+                                        window.open(payurl.href);
+                                        ReportLost(book.username, book.isbn, book.bookid);
+                                    }}>
                                         Lost
                                     </Button>
                                 </TableCell>

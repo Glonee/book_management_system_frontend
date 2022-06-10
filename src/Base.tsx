@@ -36,7 +36,8 @@ function Base({ pages, mode }: { pages: { name: string, to: string }[], mode: "u
                     <Button
                         color="inherit"
                         onClick={() => {
-                            localStorage.clear();
+                            localStorage.removeItem(`${mode}name`);
+                            localStorage.removeItem(`${mode}token`);
                             navigate(mode === "user" ?
                                 (homepage === "/" ? "/signin" : `${homepage}/signin`)
                                 : (homepage === "/" ? "/admin/signin" : `${homepage}/admin/signin`),

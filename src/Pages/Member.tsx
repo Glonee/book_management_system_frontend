@@ -37,7 +37,7 @@ function Member(): JSX.Element {
 
     function updateMembers() {
         setLoading(true);
-        fetch(`${url}/user`, {
+        fetch(`${url}/admin`, {
             method: 'POST',
             mode: 'cors',
             body: JSON.stringify({ action: "getUsers" })
@@ -45,30 +45,7 @@ function Member(): JSX.Element {
             .then(res => res.json())
             .then(
                 obj => { setMembers(obj); setLoading(false); },
-                () => {
-                    setMembers([
-                        {
-                            "username": "123455",
-                            "password": "123123",
-                            "email": "devil@qq.com",
-                            "birth": "2001-04-12",
-                            "phone": "2132142434",
-                            "gender": "男"
-                        },
-                        {
-                            "username": "dsafdasf",
-                            "password": "123123",
-                            "email": "devil@qq.com",
-                            "birth": "2001-04-12",
-                            "phone": "2132142434",
-                            "gender": "男"
-                        }
-                    ]);
-                    setLoading(false);
-                    /*
-                    setAlertinfo({ open: true, message: "Network error", serivity: "error" });
-                    setLoading(false);*/
-                }
+                () => setLoading(false)
             )
     }
     function deleteUser(username: string) {
